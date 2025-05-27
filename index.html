@@ -1,0 +1,1512 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Livslinjen - En svensk resa</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .game-screen {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .character-info {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 5px solid #007bff;
+        }
+
+        .character-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .stat-item {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+
+        .timeline-container {
+            margin: 20px 0;
+        }
+
+        .timeline {
+            background: #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            min-height: 300px;
+            position: relative;
+            overflow-x: auto;
+        }
+
+        .timeline-grid {
+            display: grid;
+            grid-template-rows: repeat(6, 40px);
+            gap: 5px;
+            min-width: 800px;
+        }
+
+        .timeline-row {
+            display: grid;
+            grid-template-columns: 120px repeat(10, 1fr);
+            gap: 2px;
+            align-items: center;
+        }
+
+        .row-label {
+            font-weight: bold;
+            padding: 8px;
+            background: #6c757d;
+            color: white;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 0.9em;
+        }
+
+        .timeline-cell {
+            height: 35px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            background: #f8f9fa;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .timeline-cell:hover {
+            background: #e3f2fd;
+            transform: scale(1.05);
+        }
+
+        .project-block {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            cursor: move;
+            z-index: 10;
+        }
+
+        .project-menu {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .project-category {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            border: 2px solid #dee2e6;
+            transition: all 0.3s ease;
+        }
+
+        .project-category:hover {
+            border-color: #007bff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .project-category h4 {
+            margin-bottom: 10px;
+            color: #495057;
+        }
+
+        .project-item {
+            background: #f8f9fa;
+            padding: 8px 12px;
+            margin: 5px 0;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        .project-item:hover {
+            background: #e3f2fd;
+            border-color: #007bff;
+        }
+
+        .project-item.selected {
+            background: #007bff;
+            color: white;
+        }
+
+        .historical-events {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .historical-events h3 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,123,255,0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+
+        .decade-header {
+            text-align: center;
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .decade-header h2 {
+            font-size: 1.8em;
+            margin-bottom: 5px;
+        }
+
+        .reflection-screen {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+        }
+
+        .life-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #007bff;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #28a745, #20c997);
+            transition: width 0.8s ease;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .intro-screen {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .intro-screen h2 {
+            color: #007bff;
+            margin-bottom: 20px;
+        }
+
+        .intro-screen p {
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            color: #495057;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .timeline-grid {
+                min-width: 600px;
+            }
+            
+            .project-menu {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🇸🇪 Livslinjen - En svensk resa</h1>
+            <p>Ett sociologiskt simulationsspel om att växa upp i Sverige 1960-2020</p>
+        </div>
+
+        <div id="gameScreen" class="game-screen">
+            <!-- Intro Screen -->
+            <div id="introScreen" class="intro-screen">
+                <h2>Välkommen till ditt liv</h2>
+                <p>Du är på väg att följa en persons resa genom det moderna Sverige.</p>
+                <p>Från 1960-talet till idag - hur påverkar samhällsförändringar, klass, kön och geografi våra livsval?</p>
+                <p>Varje decennium får du planera livsprojekt inom utbildning, arbete, relationer, boende och fritid.</p>
+                <p><strong>Kom ihåg:</strong> Dina val påverkas av både personliga önskningar och strukturella förutsättningar.</p>
+                <button class="btn btn-primary" onclick="startGame()">Börja din resa</button>
+            </div>
+
+            <!-- Character Generation Screen -->
+            <div id="characterScreen" style="display: none;">
+                <h2>Din karaktär genereras...</h2>
+                <div id="characterInfo" class="character-info"></div>
+                <button class="btn btn-primary" onclick="startDecade()">Fortsätt till första decenniet</button>
+            </div>
+
+            <!-- Game Screen -->
+            <div id="gameplayScreen" style="display: none;">
+                <div id="decadeHeader" class="decade-header"></div>
+                
+                <div id="characterDisplay" class="character-info"></div>
+                
+                <div id="historicalEvents" class="historical-events"></div>
+                
+                <div class="timeline-container">
+                    <h3>Din livstidslinje (10 år)</h3>
+                    <div class="timeline">
+                        <div id="timelineGrid" class="timeline-grid"></div>
+                    </div>
+                    <p><em>Klicka på år-rutorna för att placera projekt. Dra för att ändra längd.</em></p>
+                </div>
+                
+                <div class="project-menu" id="projectMenu"></div>
+                
+                <div class="controls">
+                    <button class="btn btn-secondary" onclick="clearTimeline()">Rensa tidslinje</button>
+                    <button class="btn btn-primary" onclick="completeDecade()">Slutför decennium</button>
+                </div>
+            </div>
+
+            <!-- Reflection Screen -->
+            <div id="reflectionScreen" style="display: none;" class="reflection-screen">
+                <h2>Reflektion över ditt decennium</h2>
+                <div id="reflectionContent"></div>
+                <div class="controls">
+                    <button class="btn btn-primary" onclick="nextDecade()">Nästa decennium</button>
+                </div>
+            </div>
+
+            <!-- Final Summary -->
+            <div id="summaryScreen" style="display: none;" class="reflection-screen">
+                <h2>Din livsresa - Sammanfattning</h2>
+                <div id="lifeSummary" class="life-summary"></div>
+                <div class="controls">
+                    <button class="btn btn-primary" onclick="restartGame()">Spela igen</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game State
+        let gameState = {
+            character: null,
+            currentDecade: 0,
+            decades: ['1960-tal', '1970-tal', '1980-tal', '1990-tal', '2000-tal', '2010-tal'],
+            age: 20,
+            projects: [],
+            stats: {
+                education: 30,
+                career: 20,
+                relationships: 40,
+                health: 80,
+                happiness: 60,
+                money: 100
+            },
+            capital: {
+                economic: 100,    // Pengar
+                cultural: 30,     // Utbildning, kulturell kunskap
+                social: 40,       // Nätverk, vänskap
+                symbolic: 20,     // Status, erkännande
+                time: 100         // Tid att spendera per decennium
+            },
+            completedProjects: [],
+            availableProjects: {},
+            randomEvents: [],
+            constraints: {
+                hasFamily: false,
+                hasChildren: false,
+                isMarried: false,
+                hasJob: false,
+                education_level: 'basic'
+            }
+        };
+
+        // Swedish cities with population weights
+        const swedishCities = [
+            { name: 'Stockholm', weight: 25, region: 'Storstadsregion' },
+            { name: 'Göteborg', weight: 15, region: 'Storstadsregion' },
+            { name: 'Malmö', weight: 10, region: 'Storstadsregion' },
+            { name: 'Uppsala', weight: 5, region: 'Mellanstor stad' },
+            { name: 'Linköping', weight: 4, region: 'Mellanstor stad' },
+            { name: 'Örebro', weight: 4, region: 'Mellanstor stad' },
+            { name: 'Västerås', weight: 3, region: 'Mellanstor stad' },
+            { name: 'Norrköping', weight: 3, region: 'Mellanstor stad' },
+            { name: 'Helsingborg', weight: 3, region: 'Mellanstor stad' },
+            { name: 'Jönköping', weight: 3, region: 'Mellanstor stad' },
+            { name: 'Småort i Småland', weight: 8, region: 'Småort' },
+            { name: 'Småort i Dalarna', weight: 6, region: 'Småort' },
+            { name: 'Glesbygd i Norrland', weight: 11, region: 'Glesbygd' }
+        ];
+
+        const socialClasses = [
+            { name: 'Arbetarklass', weight: 45, startMoney: 50, opportunities: 0.7 },
+            { name: 'Medelklass', weight: 40, startMoney: 150, opportunities: 1.0 },
+            { name: 'Överklass', weight: 15, startMoney: 300, opportunities: 1.5 }
+        ];
+
+        // Historical events by decade
+        const historicalEvents = {
+            0: { // 1960s
+                title: '1960-talet - Folkhemmets guldålder',
+                events: [
+                    'Välfärdsstaten expanderar kraftigt',
+                    'Allmän pension införs',
+                    'Könsrollerna börjar ifrågasättas',
+                    'Ekonomisk tillväxt och full sysselsättning'
+                ]
+            },
+            1: { // 1970s
+                title: '1970-talet - Förändringens decennium',
+                events: [
+                    'Miljömedvetenhet växer fram',
+                    'Kvinnors rättigheter stärks',
+                    'Oljekrisen påverkar ekonomin',
+                    'Föreningsliv och kollektiv blomstrar'
+                ]
+            },
+            2: { // 1980s
+                title: '1980-talet - Individualism och tillväxt',
+                events: [
+                    'Avreglering av finansmarknaden',
+                    'IT-revolutionen börjar',
+                    'Bostadsrätter blir populära',
+                    'Ökade klassklyftor'
+                ]
+            },
+            3: { // 1990s
+                title: '1990-talet - Kris och förnyelse',
+                events: [
+                    'Bankkrisen och lågkonjunktur',
+                    'Sverige går med i EU',
+                    'Internet revolutionerar kommunikation',
+                    'Arbetslöshet och omstrukturering'
+                ]
+            },
+            4: { // 2000s
+                title: '2000-talet - Globalisering',
+                events: [
+                    'Ökad invandring och mångkultur',
+                    'Bostadspriserna stiger kraftigt',
+                    'Digitalisering av samhället',
+                    'Klimatfrågan blir central'
+                ]
+            },
+            5: { // 2010s
+                title: '2010-talet - Digital revolution',
+                events: [
+                    'Sociala medier förändrar kommunikation',
+                    'Flyktingkrisen 2015',
+                    'Politisk polarisering ökar',
+                    'Gig-ekonomi och nya arbetsformer'
+                ]
+            }
+        };
+
+        // Project categories and options with detailed costs and requirements
+        const projectCategories = {
+            'Utbildning': {
+                color: '#007bff',
+                projects: [
+                    { 
+                        name: 'Gymnasium', 
+                        duration: 3, 
+                        costs: { economic: 30, time: 30 },
+                        requirements: { cultural: 20 },
+                        benefits: { cultural: 40, symbolic: 15, education: 30 },
+                        description: 'Grundläggande högskoleforberedande utbildning'
+                    },
+                    { 
+                        name: 'Universitet', 
+                        duration: 4, 
+                        costs: { economic: 80, time: 40 },
+                        requirements: { cultural: 50, education_level: 'gymnasium' },
+                        benefits: { cultural: 60, symbolic: 30, career: 25, education: 50 },
+                        description: 'Akademisk utbildning som öppnar karriärmöjligheter'
+                    },
+                    { 
+                        name: 'Yrkesskola', 
+                        duration: 2, 
+                        costs: { economic: 40, time: 20 },
+                        requirements: { cultural: 15 },
+                        benefits: { career: 35, economic: 20, education: 25 },
+                        description: 'Praktisk yrkesutbildning med snabb väg till arbetsmarknaden'
+                    },
+                    { 
+                        name: 'Komvux', 
+                        duration: 2, 
+                        costs: { economic: 25, time: 15 },
+                        requirements: {},
+                        benefits: { cultural: 25, education: 20 },
+                        description: 'Komplettera din utbildning på kvällstid'
+                    }
+                ]
+            },
+            'Arbete': {
+                color: '#28a745',
+                projects: [
+                    { 
+                        name: 'Fabriksarbete', 
+                        duration: 5, 
+                        costs: { time: 50 },
+                        requirements: {},
+                        benefits: { economic: 120, career: 10, social: 15 },
+                        income: true,
+                        description: 'Stabilt industriarbete med facklig gemenskap'
+                    },
+                    { 
+                        name: 'Kontorsarbete', 
+                        duration: 5, 
+                        costs: { time: 45 },
+                        requirements: { cultural: 40, education_level: 'gymnasium' },
+                        benefits: { economic: 180, career: 25, symbolic: 15 },
+                        income: true,
+                        description: 'Tjänstemannaarbete med karriärmöjligheter'
+                    },
+                    { 
+                        name: 'Akademisk karriär', 
+                        duration: 8, 
+                        costs: { time: 60 },
+                        requirements: { cultural: 70, education_level: 'universitet' },
+                        benefits: { economic: 250, career: 40, symbolic: 35 },
+                        income: true,
+                        description: 'Forsknings- eller experttjänst med hög status'
+                    },
+                    { 
+                        name: 'Egen företagare', 
+                        duration: 6, 
+                        costs: { economic: 150, time: 70 },
+                        requirements: { social: 30, symbolic: 20 },
+                        benefits: { economic: 300, career: 35, symbolic: 25 },
+                        income: true,
+                        description: 'Starta eget företag - risk men möjlighet'
+                    }
+                ]
+            },
+            'Relationer': {
+                color: '#dc3545',
+                projects: [
+                    { 
+                        name: 'Gifta sig', 
+                        duration: 1, 
+                        costs: { economic: 80, time: 10 },
+                        requirements: { social: 30 },
+                        benefits: { happiness: 35, relationships: 40, social: 20 },
+                        constraints: { isMarried: true },
+                        description: 'Formalisera en kärleksrelation'
+                    },
+                    { 
+                        name: 'Skaffa barn', 
+                        duration: 3, 
+                        costs: { economic: 120, time: 40 },
+                        requirements: { relationships: 30 },
+                        benefits: { happiness: 50, relationships: 35 },
+                        constraints: { hasChildren: true, hasFamily: true },
+                        description: 'Bilda familj och få barn'
+                    },
+                    { 
+                        name: 'Vänskap', 
+                        duration: 3, 
+                        costs: { time: 15 },
+                        requirements: {},
+                        benefits: { happiness: 25, relationships: 30, social: 25 },
+                        description: 'Bygga och underhålla vänskapsrelationer'
+                    },
+                    { 
+                        name: 'Föreningsliv', 
+                        duration: 4, 
+                        costs: { time: 20 },
+                        requirements: { social: 20 },
+                        benefits: { happiness: 30, relationships: 35, social: 30, symbolic: 10 },
+                        description: 'Engagera dig i föreningar och organisationer'
+                    }
+                ]
+            },
+            'Boende': {
+                color: '#fd7e14',
+                projects: [
+                    { 
+                        name: 'Hyresrätt', 
+                        duration: 5, 
+                        costs: { economic: 60, time: 5 },
+                        requirements: {},
+                        benefits: { happiness: 15 },
+                        description: 'Trygg hyresrätt i det allmännyttiga systemet'
+                    },
+                    { 
+                        name: 'Bostadsrätt', 
+                        duration: 8, 
+                        costs: { economic: 200, time: 10 },
+                        requirements: { economic: 150, social: 25 },
+                        benefits: { happiness: 30, economic: 60, symbolic: 20 },
+                        description: 'Köpa bostadsrätt - investering och status'
+                    },
+                    { 
+                        name: 'Villa', 
+                        duration: 10, 
+                        costs: { economic: 400, time: 15 },
+                        requirements: { economic: 300, symbolic: 25 },
+                        benefits: { happiness: 45, economic: 120, symbolic: 35 },
+                        description: 'Eget hus med trädgård - den svenska drömmen'
+                    },
+                    { 
+                        name: 'Kollektiv', 
+                        duration: 3, 
+                        costs: { economic: 30, time: 10 },
+                        requirements: { social: 40 },
+                        benefits: { happiness: 20, relationships: 25, social: 30 },
+                        description: 'Bo tillsammans och dela resurser'
+                    }
+                ]
+            },
+            'Hälsa & Fritid': {
+                color: '#6f42c1',
+                projects: [
+                    { 
+                        name: 'Träning', 
+                        duration: 5, 
+                        costs: { economic: 40, time: 25 },
+                        requirements: {},
+                        benefits: { health: 35, happiness: 20, symbolic: 10 },
+                        blocked_by: ['hasChildren'],
+                        description: 'Regelbunden motion och friskvård'
+                    },
+                    { 
+                        name: 'Resor', 
+                        duration: 1, 
+                        costs: { economic: 100, time: 15 },
+                        requirements: { economic: 80 },
+                        benefits: { happiness: 40, cultural: 20 },
+                        blocked_by: ['hasChildren'],
+                        description: 'Utforska världen och vidga vyerna'
+                    },
+                    { 
+                        name: 'Hobbyer', 
+                        duration: 4, 
+                        costs: { economic: 50, time: 20 },
+                        requirements: {},
+                        benefits: { happiness: 30, cultural: 15, social: 10 },
+                        reduced_by: ['hasFamily'],
+                        description: 'Kreativa och rekreativa intressen'
+                    },
+                    { 
+                        name: 'Terapi', 
+                        duration: 2, 
+                        costs: { economic: 80, time: 10 },
+                        requirements: {},
+                        benefits: { health: 30, happiness: 25 },
+                        description: 'Professionell hjälp för mental hälsa'
+                    }
+                ]
+            },
+            'Samhälle': {
+                color: '#20c997',
+                projects: [
+                    { 
+                        name: 'Politiskt engagemang', 
+                        duration: 4, 
+                        costs: { time: 30 },
+                        requirements: { cultural: 30, social: 25 },
+                        benefits: { happiness: 25, relationships: 20, social: 25, symbolic: 20 },
+                        description: 'Delta i det demokratiska samhället'
+                    },
+                    { 
+                        name: 'Volontärarbete', 
+                        duration: 3, 
+                        costs: { time: 20 },
+                        requirements: { social: 20 },
+                        benefits: { happiness: 35, relationships: 25, social: 20 },
+                        description: 'Hjälpa andra utan ekonomisk ersättning'
+                    },
+                    { 
+                        name: 'Miljöaktivism', 
+                        duration: 3, 
+                        costs: { time: 25 },
+                        requirements: { cultural: 25 },
+                        benefits: { happiness: 30, social: 15 },
+                        era_bonus: { 1: 10, 4: 15, 5: 20 }, // Extra relevans vissa decennier
+                        description: 'Kämpa för miljön och framtiden'
+                    },
+                    { 
+                        name: 'Kulturengagemang', 
+                        duration: 4, 
+                        costs: { economic: 30, time: 25 },
+                        requirements: { cultural: 35 },
+                        benefits: { happiness: 35, cultural: 25, social: 15, symbolic: 15 },
+                        description: 'Teater, musik, konst och litteratur'
+                    }
+                ]
+            }
+        };
+
+        // Random events that can occur
+        const randomEventTypes = {
+            positive: [
+                {
+                    title: 'Oväntat arv',
+                    description: 'En släkting lämnar dig pengar',
+                    effect: { economic: 100, happiness: 20 },
+                    probability: 0.15
+                },
+                {
+                    title: 'Jobberbjudande',
+                    description: 'Du får ett bra jobberbjudande genom kontakter',
+                    effect: { career: 15, social: 10 },
+                    requirements: { social: 30 },
+                    probability: 0.2
+                },
+                {
+                    title: 'Nya vänskap',
+                    description: 'Du träffar människor som blir viktiga vänner',
+                    effect: { social: 20, happiness: 15 },
+                    probability: 0.25
+                },
+                {
+                    title: 'Stipendium',
+                    description: 'Du får ekonomiskt stöd för studier',
+                    effect: { economic: 50, cultural: 10 },
+                    requirements: { cultural: 40 },
+                    probability: 0.1
+                }
+            ],
+            negative: [
+                {
+                    title: 'Sjukdom',
+                    description: 'Hälsoproblem påverkar ditt liv',
+                    effect: { health: -25, economic: -30 },
+                    probability: 0.15
+                },
+                {
+                    title: 'Arbetslöshet',
+                    description: 'Du förlorar ditt jobb i en omstrukturering',
+                    effect: { career: -20, economic: -50, happiness: -15 },
+                    probability: 0.12
+                },
+                {
+                    title: 'Relationsproblem',
+                    description: 'Svårigheter i nära relationer',
+                    effect: { relationships: -20, happiness: -20 },
+                    probability: 0.18
+                },
+                {
+                    title: 'Ekonomiska problem',
+                    description: 'Oväntade utgifter eller dåliga investeringar',
+                    effect: { economic: -80, happiness: -10 },
+                    probability: 0.1
+                }
+            ],
+            neutral: [
+                {
+                    title: 'Flytt',
+                    description: 'Möjlighet att flytta till en annan stad',
+                    effect: { social: -10, happiness: 10 },
+                    probability: 0.2
+                },
+                {
+                    title: 'Ny möjlighet',
+                    description: 'En ny dörr öppnas i livet',
+                    effect: { symbolic: 10 },
+                    unlocks: ['special_project'],
+                    probability: 0.15
+                }
+            ]
+        };
+
+        function weightedRandom(items) {
+            const totalWeight = items.reduce((sum, item) => sum + item.weight, 0);
+            let random = Math.random() * totalWeight;
+            
+            for (let item of items) {
+                random -= item.weight;
+                if (random <= 0) return item;
+            }
+            return items[items.length - 1];
+        }
+
+        function generateCharacter() {
+            const city = weightedRandom(swedishCities);
+            const socialClass = weightedRandom(socialClasses);
+            const gender = Math.random() > 0.5 ? 'Kvinna' : 'Man';
+            const birthYear = 1940 + Math.floor(Math.random() * 20);
+            
+            gameState.character = {
+                birthPlace: city.name,
+                region: city.region,
+                gender: gender,
+                socialClass: socialClass.name,
+                birthYear: birthYear,
+                startingMoney: socialClass.startMoney + (Math.random() * 50 - 25),
+                opportunities: socialClass.opportunities
+            };
+            
+            gameState.stats.money = gameState.character.startingMoney;
+            
+            // Adjust starting stats based on character background
+            if (socialClass.name === 'Arbetarklass') {
+                gameState.stats.education = 20;
+                gameState.stats.money = Math.max(50, gameState.stats.money);
+            } else if (socialClass.name === 'Överklass') {
+                gameState.stats.education = 50;
+                gameState.stats.career = 30;
+            }
+            
+            if (city.region === 'Glesbygd') {
+                gameState.stats.health = 90;
+                gameState.stats.happiness = 70;
+            } else if (city.region === 'Storstadsregion') {
+                gameState.stats.career = gameState.stats.career + 10;
+            }
+        }
+
+        function displayCharacter() {
+            const char = gameState.character;
+            document.getElementById('characterInfo').innerHTML = `
+                <h3>Din karaktär</h3>
+                <p><strong>Födda:</strong> ${char.birthYear} i ${char.birthPlace}</p>
+                <p><strong>Kön:</strong> ${char.gender}</p>
+                <p><strong>Samhällsklass:</strong> ${char.socialClass}</p>
+                <p><strong>Region:</strong> ${char.region}</p>
+                <div class="character-stats">
+                    <div class="stat-item">
+                        <strong>Utbildning:</strong> ${gameState.stats.education}%
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${gameState.stats.education}%"></div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <strong>Karriär:</strong> ${gameState.stats.career}%
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${gameState.stats.career}%"></div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <strong>Relationer:</strong> ${gameState.stats.relationships}%
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${gameState.stats.relationships}%"></div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <strong>Hälsa:</strong> ${gameState.stats.health}%
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${gameState.stats.health}%"></div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <strong>Lycka:</strong> ${gameState.stats.happiness}%
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${gameState.stats.happiness}%"></div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <strong>Ekonomi:</strong> ${Math.round(gameState.stats.money)} kr
+                    </div>
+                </div>
+            `;
+        }
+
+        function createTimeline() {
+            const grid = document.getElementById('timelineGrid');
+            const categories = Object.keys(projectCategories);
+            
+            grid.innerHTML = '';
+            
+            categories.forEach(category => {
+                const row = document.createElement('div');
+                row.className = 'timeline-row';
+                
+                const label = document.createElement('div');
+                label.className = 'row-label';
+                label.textContent = category;
+                label.style.backgroundColor = projectCategories[category].color;
+                row.appendChild(label);
+                
+                for (let year = 0; year < 10; year++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'timeline-cell';
+                    cell.dataset.category = category;
+                    cell.dataset.year = year;
+                    cell.addEventListener('click', handleCellClick);
+                    row.appendChild(cell);
+                }
+                
+                grid.appendChild(row);
+            });
+        }
+
+        function createProjectMenu() {
+            const menu = document.getElementById('projectMenu');
+            menu.innerHTML = '';
+            
+            Object.entries(projectCategories).forEach(([category, data]) => {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'project-category';
+                
+                const title = document.createElement('h4');
+                title.textContent = category;
+                title.style.color = data.color;
+                categoryDiv.appendChild(title);
+                
+                data.projects.forEach(project => {
+                    const projectDiv = document.createElement('div');
+                    projectDiv.className = 'project-item';
+                    projectDiv.textContent = `${project.name} (${project.duration} år)`;
+                    projectDiv.dataset.category = category;
+                    projectDiv.dataset.project = project.name;
+                    projectDiv.addEventListener('click', () => selectProject(category, project));
+                    categoryDiv.appendChild(projectDiv);
+                });
+                
+                menu.appendChild(categoryDiv);
+            });
+        }
+
+        function selectProject(category, project) {
+            // Remove previous selection
+            document.querySelectorAll('.project-item.selected').forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            // Select new project
+            event.target.classList.add('selected');
+            selectedProject = { category, project };
+        }
+
+        function handleCellClick(event) {
+            if (!selectedProject) {
+                alert('Välj först ett projekt från menyn nedan!');
+                return;
+            }
+            
+            const category = event.target.dataset.category;
+            const year = parseInt(event.target.dataset.year);
+            
+            if (category !== selectedProject.category) {
+                alert('Du kan bara placera projektet i rätt kategori!');
+                return;
+            }
+            
+            // Check if player can afford the project
+            if (selectedProject.project.cost > gameState.stats.money) {
+                alert('Du har inte råd med detta projekt!');
+                return;
+            }
+            
+            // Check requirements
+            const requirements = selectedProject.project.requirements;
+            if (requirements.length > 0) {
+                const hasRequirements = requirements.every(req => 
+                    gameState.completedProjects.some(proj => proj.name === req)
+                );
+                if (!hasRequirements) {
+                    alert(`Du behöver först slutföra: ${requirements.join(', ')}`);
+                    return;
+                }
+            }
+            
+            placeProject(category, year, selectedProject.project);
+        }
+
+        function placeProject(category, startYear, project) {
+            // Remove any existing project in this location
+            const existingProject = gameState.projects.find(p => 
+                p.category === category && 
+                p.startYear <= startYear && 
+                p.startYear + p.duration > startYear
+            );
+            
+            if (existingProject) {
+                removeProject(existingProject);
+            }
+            
+            // Check if project fits in timeline
+            if (startYear + project.duration > 10) {
+                if (!confirm('Projektet kommer att fortsätta in i nästa decennium. Fortsätt?')) {
+                    return;
+                }
+            }
+            
+            // Add project to game state
+            const newProject = {
+                ...project,
+                category: category,
+                startYear: startYear,
+                id: Date.now() + Math.random()
+            };
+            
+            gameState.projects.push(newProject);
+            gameState.stats.money -= project.cost;
+            
+            renderProjects();
+            displayCharacter();
+        }
+
+        function removeProject(project) {
+            const index = gameState.projects.indexOf(project);
+            if (index > -1) {
+                gameState.projects.splice(index, 1);
+                gameState.stats.money += project.cost;
+            }
+        }
+
+        function renderProjects() {
+            // Clear existing project blocks
+            document.querySelectorAll('.project-block').forEach(block => block.remove());
+            
+            gameState.projects.forEach(project => {
+                const category = project.category;
+                const startYear = project.startYear;
+                const duration = Math.min(project.duration, 10 - startYear);
+                
+                for (let i = 0; i < duration; i++) {
+                    const cell = document.querySelector(`[data-category="${category}"][data-year="${startYear + i}"]`);
+                    if (cell) {
+                        const block = document.createElement('div');
+                        block.className = 'project-block';
+                        block.style.backgroundColor = projectCategories[category].color;
+                        block.style.width = '100%';
+                        block.textContent = i === 0 ? project.name : '';
+                        block.title = `${project.name} (År ${i + 1}/${project.duration})`;
+                        block.addEventListener('click', () => {
+                            if (confirm('Ta bort detta projekt?')) {
+                                removeProject(project);
+                                renderProjects();
+                                displayCharacter();
+                            }
+                        });
+                        cell.appendChild(block);
+                    }
+                }
+            });
+        }
+
+        function clearTimeline() {
+            if (confirm('Är du säker på att du vill rensa hela tidslinjen?')) {
+                // Refund money for all projects
+                gameState.projects.forEach(project => {
+                    gameState.stats.money += project.cost;
+                });
+                gameState.projects = [];
+                renderProjects();
+                displayCharacter();
+            }
+        }
+
+        function completeDecade() {
+            if (gameState.projects.length === 0) {
+                if (!confirm('Du har inte lagt några projekt. Vill du verkligen fortsätta?')) {
+                    return;
+                }
+            }
+            
+            // Apply project benefits
+            gameState.projects.forEach(project => {
+                Object.entries(project.benefits).forEach(([stat, value]) => {
+                    if (stat === 'money') {
+                        gameState.stats[stat] += value;
+                    } else {
+                        gameState.stats[stat] = Math.min(100, gameState.stats[stat] + value);
+                    }
+                });
+                
+                // Add to completed projects if fully completed
+                if (project.startYear + project.duration <= 10) {
+                    gameState.completedProjects.push(project);
+                }
+            });
+            
+            // Apply decade-specific effects
+            applyDecadeEffects();
+            
+            // Age character
+            gameState.age += 10;
+            
+            showReflection();
+        }
+
+        function applyDecadeEffects() {
+            const decade = gameState.currentDecade;
+            const char = gameState.character;
+            
+            // Apply historical context effects
+            switch(decade) {
+                case 0: // 1960s
+                    if (char.socialClass === 'Arbetarklass') {
+                        gameState.stats.money += 50; // Full employment
+                        gameState.stats.happiness += 10;
+                    }
+                    break;
+                case 1: // 1970s
+                    if (char.gender === 'Kvinna') {
+                        gameState.stats.career += 15; // Women's liberation
+                    }
+                    gameState.stats.health += 5; // Environmental awareness
+                    break;
+                case 2: // 1980s
+                    if (char.socialClass === 'Överklass') {
+                        gameState.stats.money += 100; // Financial deregulation
+                    }
+                    gameState.stats.happiness -= 5; // Increased inequality
+                    break;
+                case 3: // 1990s
+                    gameState.stats.money -= 30; // Economic crisis
+                    if (gameState.completedProjects.some(p => p.name.includes('Universitet'))) {
+                        gameState.stats.career += 20; // EU membership benefits educated
+                    }
+                    break;
+                case 4: // 2000s
+                    if (char.region === 'Storstadsregion') {
+                        gameState.stats.money += 80; // Housing boom
+                    }
+                    gameState.stats.relationships += 10; // Multiculturalism
+                    break;
+                case 5: // 2010s
+                    gameState.stats.career += 15; // Digital economy
+                    gameState.stats.happiness -= 10; // Political polarization
+                    break;
+            }
+            
+            // Ensure stats stay within bounds
+            Object.keys(gameState.stats).forEach(stat => {
+                if (stat !== 'money') {
+                    gameState.stats[stat] = Math.max(0, Math.min(100, gameState.stats[stat]));
+                } else {
+                    gameState.stats[stat] = Math.max(0, gameState.stats[stat]);
+                }
+            });
+        }
+
+        function showReflection() {
+            document.getElementById('gameplayScreen').style.display = 'none';
+            document.getElementById('reflectionScreen').style.display = 'block';
+            
+            const content = document.getElementById('reflectionContent');
+            const decade = historicalEvents[gameState.currentDecade];
+            const char = gameState.character;
+            
+            // Generate reflection content
+            let reflectionText = `
+                <h3>${decade.title}</h3>
+                <p><strong>Din ålder:</strong> ${gameState.age} år</p>
+                
+                <h4>Dina projekt detta decennium:</h4>
+                <ul>
+            `;
+            
+            if (gameState.projects.length === 0) {
+                reflectionText += '<li><em>Du valde att inte genomföra några större projekt detta decennium.</em></li>';
+            } else {
+                gameState.projects.forEach(project => {
+                    reflectionText += `<li><strong>${project.name}</strong> inom ${project.category}</li>`;
+                });
+            }
+            
+            reflectionText += `
+                </ul>
+                
+                <h4>Samhällskontext:</h4>
+                <ul>
+            `;
+            
+            decade.events.forEach(event => {
+                reflectionText += `<li>${event}</li>`;
+            });
+            
+            reflectionText += `
+                </ul>
+                
+                <h4>Sociologisk reflektion:</h4>
+                <p>
+            `;
+            
+            // Generate sociological insights based on character and choices
+            const insights = generateSociologicalInsights();
+            reflectionText += insights;
+            
+            reflectionText += `
+                </p>
+                
+                <div class="character-stats">
+                    <div class="stat-item">
+                        <strong>Utbildning:</strong> ${gameState.stats.education}%
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${gameState.stats.education}%"></div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <strong>Karriär:</strong> ${gameState.stats.career}%
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${gameState.stats.career}%"></div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <strong>Relationer:</strong> ${gameState.stats.relationships}%
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${gameState.stats.relationships}%"></div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <strong>Hälsa:</strong> ${gameState.stats.health}%
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${gameState.stats.health}%"></div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <strong>Lycka:</strong> ${gameState.stats.happiness}%
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${gameState.stats.happiness}%"></div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <strong>Ekonomi:</strong> ${Math.round(gameState.stats.money)} kr
+                    </div>
+                </div>
+            `;
+            
+            content.innerHTML = reflectionText;
+        }
+
+        function generateSociologicalInsights() {
+            const char = gameState.character;
+            const decade = gameState.currentDecade;
+            const projects = gameState.projects;
+            
+            let insights = '';
+            
+            // Class-based insights
+            if (char.socialClass === 'Arbetarklass') {
+                if (projects.some(p => p.name === 'Universitet')) {
+                    insights += 'Som person från arbetarklassen som satsade på universitetsutbildning representerar du den sociala mobilitet som kännetecknade denna period. ';
+                } else {
+                    insights += 'Din bakgrund från arbetarklassen påverkar fortfarande dina valmöjligheter, trots välfärdsstatens utbyggnad. ';
+                }
+            } else if (char.socialClass === 'Överklass') {
+                insights += 'Din privilegierade bakgrund ger dig fler möjligheter och säkerhetsnaät än många andra. ';
+            }
+            
+            // Gender-based insights
+            if (char.gender === 'Kvinna') {
+                if (decade >= 1) { // 1970s and later
+                    insights += 'Som kvinna lever du genom en tid av förändrade könsroller och ökade möjligheter på arbetsmarknaden. ';
+                } else {
+                    insights += 'Som kvinna på 1960-talet är dina karriärmöjligheter mer begränsade än de kommer att bli för framtida generationer. ';
+                }
+            }
+            
+            // Geographic insights
+            if (char.region === 'Glesbygd') {
+                insights += 'Att växa upp på glesbygden påverkar dina möjligheter till utbildning och karriär, men kan också ge andra värden som närhet till naturen och gemenskap. ';
+            } else if (char.region === 'Storstadsregion') {
+                insights += 'Din storstadsbakgrund ger dig tillgång till fler utbildnings- och karriärmöjligheter, men också högre levnadskostnader. ';
+            }
+            
+            // Project-based insights
+            if (projects.length === 0) {
+                insights += 'Att inte satsa på några större projekt kan reflektera både personliga val och strukturella begränsningar. ';
+            } else if (projects.length > 3) {
+                insights += 'Din ambitiösa livsstil med många parallella projekt speglar både personlig drivkraft och möjligheter som din bakgrund erbjuder. ';
+            }
+            
+            return insights;
+        }
+
+        function nextDecade() {
+            gameState.currentDecade++;
+            
+            if (gameState.currentDecade >= gameState.decades.length) {
+                showFinalSummary();
+                return;
+            }
+            
+            // Reset for next decade
+            gameState.projects = gameState.projects.filter(p => p.startYear + p.duration > 10);
+            gameState.projects.forEach(p => {
+                p.startYear = Math.max(0, p.startYear - 10);
+                p.duration = p.duration - Math.max(0, 10 - (p.startYear + 10));
+            });
+            
+            document.getElementById('reflectionScreen').style.display = 'none';
+            startDecade();
+        }
+
+        function showFinalSummary() {
+            document.getElementById('reflectionScreen').style.display = 'none';
+            document.getElementById('summaryScreen').style.display = 'block';
+            
+            const summary = document.getElementById('lifeSummary');
+            const char = gameState.character;
+            
+            // Calculate life achievements
+            const totalStats = Object.values(gameState.stats).reduce((sum, val) => sum + (typeof val === 'number' ? val : 0), 0);
+            const avgStats = totalStats / 6;
+            
+            const achievements = [];
+            if (gameState.completedProjects.some(p => p.name === 'Universitet')) achievements.push('Universitetsutbildad');
+            if (gameState.completedProjects.some(p => p.name === 'Egen företagare')) achievements.push('Entreprenör');
+            if (gameState.completedProjects.some(p => p.name === 'Gifta sig')) achievements.push('Gift');
+            if (gameState.completedProjects.some(p => p.name === 'Skaffa barn')) achievements.push('Förälder');
+            if (gameState.stats.money > 500) achievements.push('Ekonomiskt framgångsrik');
+            if (gameState.stats.happiness > 80) achievements.push('Lycklig');
+            
+            summary.innerHTML = `
+                <div class="summary-card">
+                    <h3>Din livsresa</h3>
+                    <p><strong>Född:</strong> ${char.birthYear} i ${char.birthPlace}</p>
+                    <p><strong>Kön:</strong> ${char.gender}</p>
+                    <p><strong>Samhällsklass:</strong> ${char.socialClass}</p>
+                    <p><strong>Slutålder:</strong> ${gameState.age} år</p>
+                </div>
+                
+                <div class="summary-card">
+                    <h3>Livsprestationer</h3>
+                    ${achievements.length > 0 ? 
+                        '<ul>' + achievements.map(a => `<li>${a}</li>`).join('') + '</ul>' :
+                        '<p><em>Du levde ett enkelt men meningsfullt liv.</em></p>'
+                    }
+                </div>
+                
+                <div class="summary-card">
+                    <h3>Slutliga statistik</h3>
+                    <div class="stat-item">
+                        <strong>Utbildning:</strong> ${gameState.stats.education}%
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${gameState.stats.education}%"></div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <strong>Karriär:</strong> ${gameState.stats.career}%
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${gameState.stats.career}%"></div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <strong>Relationer:</strong> ${gameState.stats.relationships}%
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${gameState.stats.relationships}%"></div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <strong>Hälsa:</strong> ${gameState.stats.health}%
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${gameState.stats.health}%"></div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <strong>Lycka:</strong> ${gameState.stats.happiness}%
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${gameState.stats.happiness}%"></div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <strong>Ekonomi:</strong> ${Math.round(gameState.stats.money)} kr
+                    </div>
+                </div>
+                
+                <div class="summary-card">
+                    <h3>Sociologisk reflektion</h3>
+                    <p>Din resa genom det moderna Sverige visar hur individuella val alltid sker inom strukturella ramar. 
+                    ${char.socialClass === 'Arbetarklass' ? 'Din arbetarklassbakgrund' : 
+                      char.socialClass === 'Medelklass' ? 'Din medelklassbakgrund' : 'Din privilegierade bakgrund'} 
+                    från ${char.birthPlace} som ${char.gender.toLowerCase()} född ${char.birthYear} har format dina möjligheter.</p>
+                    
+                    <p>Genom decennierna från 1960-talet till 2010-talet har du upplevt välfärdsstatens utbyggnad, 
+                    ekonomiska kriser, digitalisering och förändrade könsroller. Dessa samhällsförändringar har 
+                    påverkat alla svenskar, men på olika sätt beroende på social position.</p>
+                    
+                    <p><strong>Genomsnittlig livskvalitet:</strong> ${Math.round(avgStats)}%</p>
+                    <p><em>Tack för att du utforskade hur struktur och agency samverkar i ett svenskt liv!</em></p>
+                </div>
+            `;
+        }
+
+        function restartGame() {
+            // Reset game state
+            gameState = {
+                character: null,
+                currentDecade: 0,
+                decades: ['1960-tal', '1970-tal', '1980-tal', '1990-tal', '2000-tal', '2010-tal'],
+                age: 20,
+                projects: [],
+                stats: {
+                    education: 30,
+                    career: 20,
+                    relationships: 40,
+                    health: 80,
+                    happiness: 60,
+                    money: 100
+                },
+                completedProjects: []
+            };
+            
+            selectedProject = null;
+            
+            // Show intro screen
+            document.getElementById('summaryScreen').style.display = 'none';
+            document.getElementById('introScreen').style.display = 'block';
+        }
+
+        function startGame() {
+            document.getElementById('introScreen').style.display = 'none';
+            document.getElementById('characterScreen').style.display = 'block';
+            
+            generateCharacter();
+            displayCharacter();
+        }
+
+        function startDecade() {
+            document.getElementById('characterScreen').style.display = 'none';
+            document.getElementById('gameplayScreen').style.display = 'block';
+            
+            // Update decade header
+            const decadeInfo = historicalEvents[gameState.currentDecade];
+            document.getElementById('decadeHeader').innerHTML = `
+                <h2>${decadeInfo.title}</h2>
+                <p>Du är nu ${gameState.age} år gammal</p>
+            `;
+            
+            // Update historical events
+            document.getElementById('historicalEvents').innerHTML = `
+                <h3>Vad händer i Sverige:</h3>
+                <ul>
+                    ${decadeInfo.events.map(event => `<li>${event}</li>`).join('')}
+                </ul>
+            `;
+            
+            // Update character display
+            document.getElementById('characterDisplay').innerHTML = document.getElementById('characterInfo').innerHTML;
+            
+            createTimeline();
+            createProjectMenu();
+            renderProjects();
+        }
+
+        // Initialize game
+        document.addEventListener('DOMContentLoaded', function() {
+            // Game starts with intro screen
+            console.log('Livslinjen - En svensk resa är redo att spelas!');
+        });
+    </script>
+</body>
+</html>
