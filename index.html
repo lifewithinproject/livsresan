@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Livslinjen</title>
+    <title>Livslinjen - En svensk resa</title>
     <style>
         * {
             margin: 0;
@@ -18,15 +18,16 @@
             color: #333;
             display: flex;
             justify-content: center;
-            align-items: center;
-            padding: 10px;
+            align-items: flex-start; /* Changed for longer content */
+            padding: 20px; /* Added padding for scroll */
+            overflow-y: auto; /* Allow body to scroll */
         }
 
         .container {
             max-width: 1200px;
             width: 100%;
-            margin: 0 auto;
-            padding: 20px;
+            margin: 20px auto; /* Adjusted margin */
+            padding: 0 10px; /* Prevent content flush with edges */
         }
 
         .header {
@@ -45,24 +46,42 @@
         }
 
         .game-screen {
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(255, 255, 255, 0.97); /* Slightly more opaque */
             border-radius: 15px;
-            padding: 30px;
+            padding: 20px 30px; /* Adjusted padding */
             box-shadow: 0 8px 32px rgba(0,0,0,0.1);
             backdrop-filter: blur(10px);
+            margin-bottom: 20px; /* Space at the bottom */
         }
 
-        .character-info, .decade-summary {
+        .character-info, .decade-summary, .life-goal-selection {
             background: #f8f9fa;
             border-radius: 10px;
             padding: 20px;
             margin-bottom: 20px;
             border-left: 5px solid #007bff;
         }
-        .character-info h3, .decade-summary h3 {
-            margin-bottom: 10px;
+        .character-info h3, .decade-summary h3, .life-goal-selection h3 {
+            margin-top:0;
+            margin-bottom: 15px;
             color: #0056b3;
         }
+        .life-goal-selection label {
+            display: block;
+            margin-bottom: 10px;
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            cursor: pointer;
+        }
+        .life-goal-selection label:hover {
+            background-color: #e9ecef;
+        }
+        .life-goal-selection input[type="radio"] {
+            margin-right: 10px;
+        }
+
 
         .character-stats {
             display: grid;
@@ -84,26 +103,48 @@
 
         .timeline-container {
             margin: 20px 0;
+            padding: 15px;
+            background-color: #f0f0f0;
+            border-radius: 10px;
         }
         .timeline-container h3 {
              color: #333;
              margin-bottom: 10px;
         }
-
-
-        .timeline {
+        .timeline-slots {
+            display: flex;
+            flex-wrap: wrap; /* Allow slots to wrap on small screens */
             background: #e9ecef;
-            border-radius: 10px;
-            padding: 20px;
-            min-height: 150px; /* Adjusted */
-            position: relative;
-            overflow-x: auto;
-        }
-        
-        #currentProjectsDisplay {
-            padding: 10px;
-            background-color: #f0f0f0;
             border-radius: 5px;
+            padding: 10px;
+            min-height: 60px; /* Ensure it has some height */
+        }
+        .timeline-slot {
+            border: 1px dashed #ccc;
+            background-color: #fff;
+            padding: 5px;
+            margin: 2px;
+            min-height: 40px; /* Make slots visible */
+            text-align: center;
+            font-size: 0.8em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #555;
+            border-radius: 3px;
+        }
+        .timeline-slot.project-year {
+            color: white;
+            font-weight: bold;
+            border-style: solid;
+        }
+
+
+        #currentProjectsDisplay { /* Used for summary list of projects */
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            margin-top:10px;
         }
         #currentProjectsDisplay p {
             margin: 5px 0;
@@ -120,7 +161,7 @@
 
         .project-menu {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); /* Slightly wider */
             gap: 15px;
             margin: 20px 0;
         }
@@ -148,7 +189,7 @@
 
         .project-item {
             background: #f8f9fa;
-            padding: 8px 12px;
+            padding: 10px 12px; /* Increased padding */
             margin: 8px 0;
             border-radius: 5px;
             cursor: pointer;
@@ -171,6 +212,7 @@
             font-size: 0.8em;
             color: #6c757d;
             margin-top: 4px;
+            line-height: 1.4;
         }
 
 
@@ -272,7 +314,7 @@
 
         .life-summary {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Wider cards */
             gap: 20px;
             margin: 20px 0;
         }
@@ -293,30 +335,15 @@
             padding-left: 0;
         }
         .summary-card li {
-            margin-bottom: 5px;
+            margin-bottom: 8px; /* Increased spacing */
             font-size: 0.95em;
         }
-
-
-        .progress-bar {
-            width: 100%;
-            height: 20px;
-            background: #e9ecef;
-            border-radius: 10px;
-            overflow: hidden;
-            margin: 10px 0;
+        .summary-card li ul li { /* For nested lists in summary */
+             font-size: 0.9em;
+             margin-left: 15px;
+             margin-top: 3px;
         }
 
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(45deg, #28a745, #20c997);
-            transition: width 0.8s ease;
-            text-align: center;
-            color: white;
-            font-weight: bold;
-            font-size: 0.8em;
-            line-height: 20px;
-        }
 
         .modal {
             display: none;
@@ -329,6 +356,7 @@
             background: rgba(0,0,0,0.6);
             align-items: center;
             justify-content: center;
+            padding: 15px;
         }
 
         .modal-content {
@@ -336,7 +364,7 @@
             padding: 30px;
             border-radius: 15px;
             max-width: 500px;
-            width: 90%;
+            width: 100%;
             text-align: center;
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
@@ -351,25 +379,46 @@
 
 
         .intro-screen {
-            text-align: center;
-            padding: 40px;
+            text-align: left; /* Changed for better readability */
+            padding: 30px;
         }
 
         .intro-screen h2 {
             color: #007bff;
             margin-bottom: 20px;
+            text-align: center;
+        }
+        .intro-screen h3 {
+            color: #0056b3;
+            margin-top: 20px;
+            margin-bottom: 10px;
         }
 
-        .intro-screen p {
-            font-size: 1.1em;
-            line-height: 1.6;
-            margin-bottom: 15px;
-            color: #495057;
+        .intro-screen p, .intro-screen li {
+            font-size: 1.05em; /* Slightly larger */
+            line-height: 1.7; /* Increased line height */
+            margin-bottom: 10px;
+            color: #333; /* Darker text */
         }
+        .intro-screen ul {
+            list-style-position: inside;
+            margin-left: 5px;
+            margin-bottom:15px;
+        }
+        .intro-screen strong {
+            color: #0056b3;
+        }
+
 
         @media (max-width: 768px) {
+            body {
+                 padding: 10px;
+            }
             .container {
-                padding: 10px;
+                padding: 0px;
+            }
+            .game-screen {
+                padding: 15px;
             }
             
             .header h1 {
@@ -381,6 +430,13 @@
             }
             .character-stats {
                 grid-template-columns: 1fr;
+            }
+            .timeline-slots {
+                flex-direction: column; /* Stack slots vertically on small screens */
+            }
+            .timeline-slot {
+                width: 100%; /* Full width for stacked slots */
+                margin-bottom: 5px;
             }
         }
     </style>
@@ -394,18 +450,52 @@
 
         <div id="gameArea" class="game-screen">
             <div id="introScreen" class="intro-screen">
-                <h2>Välkommen till ditt liv</h2>
-                <p>Du är på väg att följa en persons resa genom det moderna Sverige.</p>
-                <p>Från 1960-talet till idag - hur påverkar samhällsförändringar, klass, kön och geografi våra livsval?</p>
-                <p>Varje decennium får du planera livsprojekt inom utbildning, arbete, relationer, boende och fritid.</p>
-                <p><strong>Kom ihåg:</strong> Dina val påverkas av både personliga önskningar och strukturella förutsättningar. Dina kapitalformer (Ekonomiskt, Kulturellt, Socialt, Symboliskt och Tid) är nyckeln till dina möjligheter.</p>
-                <button class="btn btn-primary" onclick="startGame()">Börja din resa</button>
+                <h2>Välkommen till Livslinjen!</h2>
+                <p>Du är på väg att forma ett liv genom sex decennier i Sverige, från 1960-talet till 2010-talet. Dina val kommer att påverkas av samhällsförändringar, din bakgrund och dina personliga strävanden.</p>
+                
+                <h3>Så här fungerar spelet:</h3>
+                <ul>
+                    <li><strong>Karaktär:</strong> I början slumpas din karaktärs kön, födelseort och sociala bakgrund, vilket ger dig olika startförutsättningar. Du får också välja ett övergripande livsmål.</li>
+                    <li><strong>Decennier:</strong> Spelet är indelat i decennier. För varje decennium åldras din karaktär 10 år och du ställs inför nya val och möjligheter. Historiska händelser specifika för decenniet kommer att presenteras och kan påverka ditt liv.</li>
+                    <li><strong>Kapitalformer:</strong> Dina resurser är dina "kapital":
+                        <ul>
+                            <li><strong>Ekonomiskt:</strong> Pengar för att investera i projekt och boende. Tjänas genom arbete.</li>
+                            <li><strong>Kulturellt:</strong> Kunskap, utbildning och erfarenheter. Öppnar dörrar till vissa utbildningar och yrken.</li>
+                            <li><strong>Socialt:</strong> Nätverk, vänner och familjeband. Viktigt för relationer och vissa möjligheter.</li>
+                            <li><strong>Symboliskt:</strong> Status, anseende och erkännande. Kan komma från karriär och samhällsengagemang.</li>
+                            <li><strong>Tid (Ansträngning):</strong> Varje decennium har du 100 enheter "ansträngningstid" att fördela på olika projekt.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Projekt:</strong> Inom varje decennium väljer du projekt inom livets olika domäner: <strong>Utbildning, Arbete, Familj, Fritid,</strong> och <strong>Kulturellt engagemang</strong>.
+                        <ul>
+                            <li>Varje projekt har en <strong>varaktighet</strong> (1-10 år) som fyller din 10-åriga tidslinje för decenniet. Total varaktighet kan inte överstiga 10 år.</li>
+                            <li>Projekt kostar också ansträngningstid och ofta andra kapitalformer, men ger i gengäld olika fördelar (mer kapital, bättre hälsa/lycka, nya möjligheter).</li>
+                        </ul>
+                    </li>
+                    <li><strong>Hälsa & Lycka:</strong> Dessa två mätare (0-100) speglar ditt allmänna välbefinnande och påverkas av dina val, projekt och slumpmässiga händelser.</li>
+                    <li><strong>Slumpmässiga Händelser:</strong> Livet är oförutsägbart! Positiva, negativa och neutrala händelser kan inträffa och påverka din situation.</li>
+                    <li><strong>Mål:</strong> Försök att navigera livet på ett sätt som känns meningsfullt för dig, och se hur väl du uppnår ditt valda livsmål!</li>
+                </ul>
+                <p><strong>Kom ihåg:</strong> Det finns inga "rätta" eller "fel" val, bara olika livsvägar med olika konsekvenser. Lycka till!</p>
+                <div class="controls">
+                    <button class="btn btn-primary" onclick="showCharacterCreation()">Börja din resa</button>
+                </div>
             </div>
 
             <div id="characterScreen" style="display: none;">
                 <h2>Din karaktär genereras...</h2>
                 <div id="characterInfo" class="character-info"></div>
-                <button class="btn btn-primary" onclick="startFirstDecade()">Fortsätt till första decenniet</button>
+                <div id="lifeGoalSelection" class="life-goal-selection">
+                    <h3>Välj ditt övergripande livsmål:</h3>
+                    <label><input type="radio" name="lifeGoal" value="happiness" checked> Maximal Lycka: Fokusera på välbefinnande och positiva upplevelser.</label>
+                    <label><input type="radio" name="lifeGoal" value="wealth"> Ekonomisk Framgång: Sträva efter rikedom och materiell trygghet.</label>
+                    <label><input type="radio" name="lifeGoal" value="family"> Stark Familj: Prioritera nära relationer och familjeliv.</label>
+                    <label><input type="radio" name="lifeGoal" value="knowledge"> Kulturell Rikedom: Sök kunskap, utbildning och kulturella erfarenheter.</label>
+                    <label><input type="radio" name="lifeGoal" value="status"> Högt Anseende: Arbeta för status, erkännande och inflytande.</label>
+                </div>
+                <div class="controls">
+                    <button class="btn btn-primary" onclick="confirmCharacterAndGoal()">Fortsätt till första decenniet</button>
+                </div>
             </div>
             
             <div id="gameplayScreen" style="display: none;">
@@ -425,11 +515,12 @@
                 
                 <div class="timeline-container">
                     <h3>Din planering för detta decennium (10 år)</h3>
-                    <p>Total tid spenderad på projekt: <span id="timeSpent">0</span> / <span id="totalTimePerDecade">100</span> enheter.</p>
-                    <div class="timeline">
-                        <div id="currentProjectsDisplay">
-                            <p><em>Inga projekt valda än.</em></p>
+                    <p>Ansträngningstid använd: <span id="timeSpent">0</span> / <span id="totalTimePerDecade">100</span> enheter.</p>
+                    <p>År planerade i decenniet: <span id="yearsFilled">0</span> / 10 år.</p>
+                    <div id="timelineSlots" class="timeline-slots">
                         </div>
+                    <div id="currentProjectsDisplay">
+                        <p><em>Inga projekt valda än. Klicka på ett projekt nedan för att lägga till det.</em></p>
                     </div>
                 </div>
                 
@@ -454,6 +545,7 @@
                 <h2>Din livsresa - Sammanfattning</h2>
                 <div id="lifeSummary" class="life-summary"></div>
                  <div id="finalStats" class="character-info"></div>
+                 <div id="lifeGoalReflection" class="decade-summary"></div>
                 <div class="controls">
                     <button class="btn btn-primary" onclick="restartGame()">Spela igen</button>
                 </div>
@@ -464,214 +556,233 @@
     <script>
         // Game State
         let gameState = {};
-        const INITIAL_TIME_PER_DECADE = 100;
+        const INITIAL_EFFORT_TIME_PER_DECADE = 100;
+        const YEARS_PER_DECADE = 10;
 
         function getDefaultGameState() {
             return {
                 character: null,
                 currentDecadeIndex: 0,
                 decades: ['1960-tal', '1970-tal', '1980-tal', '1990-tal', '2000-tal', '2010-tal'],
-                age: 10, // Startar vid 10 års ålder, första decenniet är tonåren/unga vuxna
-                currentDecadeProjects: [], // Projekt valda för nuvarande decennium
-                allCompletedProjects: [], // Alla projekt genomförda under spelets gång
+                age: 10, 
+                currentDecadeProjects: [], 
+                currentDecadeProjectDurations: [], // Store chosen project objects with their duration for timeline
+                allCompletedProjects: [], 
+                completedUniqueProjectIds: new Set(), // To track unique projects
                 capital: {
-                    economic: 100,  // Pengar
-                    cultural: 20,   // Utbildning, kulturell kunskap
-                    social: 20,     // Nätverk, vänskap
-                    symbolic: 10,   // Status, erkännande
-                    time: INITIAL_TIME_PER_DECADE // Tid att spendera per decennium
+                    economic: 0,
+                    cultural: 0,
+                    social: 0,
+                    symbolic: 0,
+                    time: INITIAL_EFFORT_TIME_PER_DECADE 
                 },
-                stats: { // Mer som "livskvalitet"
+                stats: { 
                     health: 80,
                     happiness: 60
                 },
-                constraints: { // Förutsättningar som påverkar val
-                    education_level: 'grundskola', // e.g., 'grundskola', 'gymnasium', 'högskola', 'yrkesutbildning'
+                constraints: { 
+                    education_level: 'grundskola', 
                     hasJob: false,
                     isMarried: false,
-                    hasFamily: false, // Generic family flag, could mean married or living with partner
-                    hasChildren: false
+                    hasFamily: false, 
+                    hasChildren: false,
+                    currentHousing: 'Hyr hos föräldrar/motsv.' // Starting housing
                 },
-                decadeLog: [] // Håller koll på händelser per decennium
+                decadeLog: [] 
             };
         }
 
+        const lifeGoalsData = {
+            happiness: { name: "Maximal Lycka", description: "Fokusera på välbefinnande och positiva upplevelser.", bonus: { stats: { happiness: 0.1 } } }, // 10% bonus to happiness gains
+            wealth: { name: "Ekonomisk Framgång", description: "Sträva efter rikedom och materiell trygghet.", bonus: { capital: { economic: 0.1 } } },
+            family: { name: "Stark Familj", description: "Prioritera nära relationer och familjeliv.", bonus: { capital: { social: 0.1 } } }, // social capital gain towards family
+            knowledge: { name: "Kulturell Rikedom", description: "Sök kunskap, utbildning och kulturella erfarenheter.", bonus: { capital: { cultural: 0.1 } } },
+            status: { name: "Högt Anseende", description: "Arbeta för status, erkännande och inflytande.", bonus: { capital: { symbolic: 0.1 } } }
+        };
 
         const swedishCities = [
-            { name: 'Stockholm', weight: 25, region: 'Storstadsregion' },
+             { name: 'Stockholm', weight: 25, region: 'Storstadsregion' },
             { name: 'Göteborg', weight: 15, region: 'Storstadsregion' },
             { name: 'Malmö', weight: 10, region: 'Storstadsregion' },
-            { name: 'Uppsala', weight: 5, region: 'Mellanstor stad' },
-            { name: 'Linköping', weight: 4, region: 'Mellanstor stad' },
+            { name: 'Uppsala', weight: 5, region: 'Mellanstor stad', type: 'universitetsstad' },
+            { name: 'Lund', weight: 4, region: 'Mellanstor stad', type: 'universitetsstad' },
+            { name: 'Linköping', weight: 4, region: 'Mellanstor stad', type: 'universitetsstad' },
             { name: 'Örebro', weight: 4, region: 'Mellanstor stad' },
-            { name: 'Västerås', weight: 3, region: 'Mellanstor stad' },
-            { name: 'Norrköping', weight: 3, region: 'Mellanstor stad' },
-            { name: 'Helsingborg', weight: 3, region: 'Mellanstor stad' },
-            { name: 'Jönköping', weight: 3, region: 'Mellanstor stad' },
-            { name: 'Småort i Småland', weight: 8, region: 'Småort' },
-            { name: 'Småort i Dalarna', weight: 6, region: 'Småort' },
-            { name: 'Glesbygd i Norrland', weight: 11, region: 'Glesbygd' }
+            { name: 'Västerås', weight: 3, region: 'Mellanstor stad', type: 'industristad' },
+            { name: 'Norrköping', weight: 3, region: 'Mellanstor stad', type: 'industristad' },
+            { name: 'Kiruna', weight: 2, region: 'Småort', type: 'bruksort' },
+            { name: 'Arvika', weight: 2, region: 'Småort' },
+            { name: 'Landsbygd (Småland)', weight: 7, region: 'Landsbygd' },
+            { name: 'Landsbygd (Norrland)', weight: 8, region: 'Landsbygd' },
+            { name: 'Förort till storstad', weight: 8, region: 'Förort' }
         ];
 
         const socialClasses = [
-            { name: 'Arbetarklass', weight: 45, initialCapital: { economic: 50, cultural: 15, social: 20, symbolic: 5 }, opportunitiesModifier: 0.8 },
-            { name: 'Medelklass', weight: 40, initialCapital: { economic: 150, cultural: 30, social: 30, symbolic: 15 }, opportunitiesModifier: 1.0 },
-            { name: 'Överklass', weight: 15, initialCapital: { economic: 350, cultural: 45, social: 40, symbolic: 30 }, opportunitiesModifier: 1.2 }
+            { name: 'Arbetarklass', weight: 45, initialCapital: { economic: 80, cultural: 15, social: 25, symbolic: 10 }, opportunitiesModifier: 0.85 }, // slightly increased starting eco
+            { name: 'Medelklass', weight: 40, initialCapital: { economic: 180, cultural: 30, social: 35, symbolic: 15 }, opportunitiesModifier: 1.0 },
+            { name: 'Övre medelklass/Akademiker', weight: 10, initialCapital: { economic: 250, cultural: 45, social: 40, symbolic: 25 }, opportunitiesModifier: 1.1 },
+            { name: 'Överklass', weight: 5, initialCapital: { economic: 500, cultural: 60, social: 50, symbolic: 40 }, opportunitiesModifier: 1.25 }
         ];
         
-        const historicalEventsData = {
-            0: { // 1960s
-                title: '1960-talet - Folkhemmets guldålder',
+        const historicalEventsData = { // Titles adjusted to be more descriptive of impact
+            0: { // 1960-tal (ålder 10-19)
+                title: 'Folkhemmets Expansion och Ungdomskultur',
                 events: [
-                    'Välfärdsstaten expanderar kraftigt: Ökad tillgång till utbildning och vård.',
-                    'Allmän tilläggspension (ATP) införs, tryggare ålderdom.',
-                    'Könsrollerna börjar ifrågasättas, fler kvinnor ut på arbetsmarknaden.',
-                    'Stark ekonomisk tillväxt och nästintill full sysselsättning.'
+                    'Stark ekonomisk tillväxt skapar framtidstro och jobb.',
+                    'Utbildningsreformer: Grundskolan införs, gymnasiet byggs ut.',
+                    'Popmusik och ny ungdomskultur växer fram.',
+                    'TV:n blir vanlig i hemmen och påverkar världsbilden.'
                 ],
-                modifiers: { economic_growth: 0.1, social_change: 0.05} // Liten positiv effekt på ekonomi
+                modifiers: { capital_growth: { cultural: 0.05 }, general_optimism: 0.05} 
             },
-            1: { // 1970s
-                title: '1970-talet - Förändringens decennium',
+            1: { // 1970-tal (ålder 20-29)
+                title: 'Progg, Oljekris och Jämställdhetsdebatt',
                 events: [
-                    'Miljömedvetenhet växer fram, kärnkraftsdebatt.',
-                    'Kvinnors rättigheter stärks: fri abort, utbyggd barnomsorg.',
-                    'Oljekrisen (1973) påverkar ekonomin negativt.',
-                    'Föreningsliv och kollektiv rörelser blomstrar.'
+                    'Oljekrisen leder till ekonomisk osäkerhet och inflation.',
+                    'Miljörörelsen och kärnkraftsdebatten engagerar.',
+                    'Kvinnorörelsen kämpar för lika rättigheter, daghem byggs ut.',
+                    'LAS (Lagen om anställningsskydd) införs 1974.'
                 ],
-                modifiers: { economic_growth: -0.05, cultural_change: 0.1 } // Negativ ekonomisk, positiv kulturell
+                modifiers: { capital_change: { economic: -0.05, social: 0.05 }, job_security_increase: 0.05 } 
             },
-            2: { // 1980s
-                title: '1980-talet - Individualism och tillväxt',
+            2: { // 1980-tal (ålder 30-39)
+                title: 'Yuppies, IT-revolutionens början och Kalla Krigets slut',
                 events: [
-                    'Avreglering av finansmarknaden, "yuppie-eran".',
-                    'IT-revolutionen börjar ta form.',
-                    'Bostadsrätter blir allt vanligare och dyrare.',
-                    'Ökade klassklyftor börjar synas.'
+                    'Finansmarknaden avregleras, högkonjunktur och "yuppie-kultur".',
+                    'Datorer och tidig IT börjar sippra in i arbetsliv och hem.',
+                    'Palmemordet 1986 skakar Sverige.',
+                    'Berlinmurens fall 1989 signalerar nya tider i Europa.'
                 ],
-                modifiers: { economic_growth: 0.15, symbolic_capital_focus: 0.1} // Starkare ekonomisk tillväxt
+                modifiers: { capital_growth: { economic: 0.1, symbolic: 0.05}, tech_opportunities: 0.05} 
             },
-            3: { // 1990s
-                title: '1990-talet - Kris och förnyelse',
+            3: { // 1990-tal (ålder 40-49)
+                title: 'Ekonomisk Kris, EU-inträde och Internetbubblan',
                 events: [
-                    'Bankkrisen och djup lågkonjunktur i början av decenniet.',
-                    'Sverige går med i EU (1995).',
-                    'Internet och mobiltelefoni revolutionerar kommunikation.',
-                    'Hög arbetslöshet och stora omstruktureringar i arbetslivet.'
+                    'Fastighets- och finanskris i början av decenniet, hög arbetslöshet.',
+                    'Sverige går med i EU 1995 efter folkomröstning.',
+                    'Internet och mobiltelefoner blir allt vanligare.',
+                    'IT-bubblan växer sig stark mot slutet av decenniet.'
                 ],
-                modifiers: { economic_growth: -0.1, job_security: -0.15 } // Stor ekonomisk nedgång initialt
+                modifiers: { capital_change: { economic: -0.1 }, unemployment_risk: 0.1, tech_bubble_effect: 0.05 } 
             },
-            4: { // 2000s
-                title: '2000-talet - Globalisering och digitalisering',
+            4: { // 2000-tal (ålder 50-59)
+                title: 'Globalisering, IT-krasch och Millennieskifte',
                 events: [
-                    'Ökad invandring och ett mer mångkulturellt Sverige.',
-                    'Bostadspriserna stiger kraftigt, ökad skuldsättning.',
-                    'Digitaliseringen av samhället accelererar (bredband, sociala medier).',
-                    'Klimatfrågan blir alltmer central i debatten.'
+                    'IT-bubblan spricker, men digitaliseringen fortsätter.',
+                    'Terrorattackerna 11 september 2001 påverkar världsläget.',
+                    'Globaliseringen tilltar med ökad handel och rörlighet.',
+                    'Fastighetspriserna börjar stiga kraftigt.'
                 ],
-                modifiers: { cultural_capital_value: 0.1, economic_volatility: 0.05 }
+                modifiers: { capital_volatility: { economic: 0.05 }, cultural_capital_value_increase: 0.05 }
             },
-            5: { // 2010s
-                title: '2010-talet - Digital revolution och nya utmaningar',
+            5: { // 2010-tal (ålder 60-69)
+                title: 'Sociala Medier, Klimatfokus och Ökad Polarisering',
                 events: [
-                    'Sociala medier formar opinion och kommunikation.',
-                    'Flyktingkrisen (2015) och dess samhällseffekter.',
-                    'Politisk polarisering ökar.',
-                    'Gig-ekonomi och nya, osäkrare, arbetsformer växer fram.'
+                    'Sociala medier blir en dominerande kraft i kommunikation och opinion.',
+                    'Klimatförändringarna blir en allt hetare fråga.',
+                    'Finanskrisens efterdyningar och ökad politisk polarisering.',
+                    'Flyktingkrisen 2015 utmanar samhället.'
                 ],
-                modifiers: { social_capital_digital: 0.1, job_stability_change: -0.1 }
+                modifiers: { capital_change: { social: (gs) => gs.character.lifeGoal === 'family' ? 0.03 : -0.03 }, tech_impact_social: 0.1 } // Social capital affected differently
             }
+        };
+        
+        // --- PROJECT CATEGORIES AND PROJECTS ---
+        // Updated project structure:
+        // unique: true (if project can only be done once)
+        // duration: years it takes on the timeline (1-10)
+        // costs: { economic: X, time: Y (effort units), cultural: Z ... }
+        // requirements: { age_min, age_max, capital_min: {type: val}, education_level, constraints_is: {key:val}, prerequisite_project: "project_id" }
+        // benefits: { capital: {type:val}, stats: {type:val} }
+        // outcomes: { constraints: {key:val}, education_level: "level" }
+        // category: links back to the top-level category key for color, etc.
+
+        const projectData = {
+            // UTBILDNING
+            edu_grundskola_avslutad: { id: 'edu_grundskola_avslutad', name: "Avsluta Grundskolan", category: "Utbildning", duration: 0, costs: {}, requirements: { age_min: 15}, benefits: { capital: { cultural: 10 } }, outcomes: { education_level: "grundskola_avslutad" }, description: "Grundläggande obligatorisk utbildning.", unique: true, auto_assign_age: 15 },
+            edu_gymnasium: { id: 'edu_gymnasium', name: 'Gymnasieutbildning', category: "Utbildning", duration: 3, costs: { economic: 10, time: 35 }, requirements: { age_min: 15, age_max: 22, education_level: "grundskola_avslutad" }, benefits: { capital: { cultural: 35, social: 5 }, stats: { happiness: 5 } }, outcomes: { education_level: 'gymnasium' }, description: 'Högskoleförberedande eller yrkesinriktad utbildning.', unique: true },
+            edu_universitet_grund: { id: 'edu_universitet_grund', name: 'Universitetsstudier (Kandidat)', category: "Utbildning", duration: 3, costs: { economic: 40, time: 45, cultural: -5 }, requirements: { age_min: 18, education_level: 'gymnasium', capital_min: {cultural: 30} }, benefits: { capital: { cultural: 50, social: 10, symbolic: 15 }, stats: { happiness: 5 } }, outcomes: { education_level: 'högskola_kandidat' }, description: 'Grundläggande akademisk examen (t.ex. Kandidatexamen).', unique: true },
+            edu_universitet_avancerad: { id: 'edu_universitet_avancerad', name: 'Universitetsstudier (Master/Magister)', category: "Utbildning", duration: 2, costs: { economic: 30, time: 40, cultural: -10 }, requirements: { age_min: 20, education_level: 'högskola_kandidat', capital_min: {cultural: 60} }, benefits: { capital: { cultural: 35, symbolic: 20 }, stats: { happiness: 5 } }, outcomes: { education_level: 'högskola_master' }, description: 'Fördjupade akademiska studier.', unique: true },
+            edu_yrkeshogskola: { id: 'edu_yrkeshogskola', name: 'Yrkeshögskola/KY-utbildning', category: "Utbildning", duration: 2, costs: { economic: 20, time: 30 }, requirements: { age_min: 18, education_level: ['gymnasium', 'grundskola_avslutad'] }, benefits: { capital: { cultural: 25, social: 5 }, stats: { career_prospects: 15 } }, outcomes: { education_level: 'yrkeshögskola' }, description: 'Praktisk, yrkesinriktad högre utbildning.', unique: true },
+            edu_folkhogskola: { id: 'edu_folkhogskola', name: 'Folkhögskola (Allmän kurs/Profilkurs)', category: "Utbildning", duration: 1, costs: { economic: 10, time: 20 }, requirements: { age_min: 18 }, benefits: { capital: { cultural: 20, social: 10 }, stats: { happiness: 10 } }, outcomes: { education_level: 'folkhögskola' }, description: 'Bildning och personlig utveckling, kan ge behörighet.', }, // Kan göras flera gånger med olika inriktning
+            edu_komvux: { id: 'edu_komvux', name: 'Komvux/Vuxenutbildning', category: "Utbildning", duration: 1, costs: { economic: 5, time: 15 }, requirements: { age_min: 20 }, benefits: { capital: { cultural: 15 } }, outcomes: {}, description: 'Komplettera betyg eller läs nya kurser som vuxen.' },
+
+            // ARBETE
+            work_sommarjobb: { id: 'work_sommarjobb', name: 'Sommarjobb/Extrajobb', category: "Arbete", duration: 0, costs: { time: 15 }, requirements: { age_min: 15, age_max: 25 }, benefits: { capital: { economic: 20, social: 5 }, stats: { career_prospects: 5 } }, outcomes: {}, description: 'Tjäna extra pengar och få arbetslivserfarenhet.' }, // Duration 0 means it's a short-term project within a year
+            work_enkelt_heltid: { id: 'work_enkelt_heltid', name: 'Enklare Heltidsarbete', category: "Arbete", duration: 5, costs: { time: 50 }, requirements: { age_min: 18, education_level: ['grundskola_avslutad', 'gymnasium', 'folkhögskola'] }, benefits: { capital: { economic: 120, social: 5 }, stats: { health: -5 } }, outcomes: { constraints: { hasJob: true } }, description: 'Stabilt men kanske slitsamt arbete utan större krav på utbildning.' },
+            work_kvalificerat: { id: 'work_kvalificerat', name: 'Kvalificerat Arbete', category: "Arbete", duration: 8, costs: { time: 60 }, requirements: { age_min: 22, education_level: ['gymnasium', 'yrkeshögskola', 'högskola_kandidat'] }, benefits: { capital: { economic: 200, symbolic: 10 }, stats: { career_prospects: 20 } }, outcomes: { constraints: { hasJob: true } }, description: 'Anställning som kräver viss utbildning eller erfarenhet.' },
+            work_specialist_chef: { id: 'work_specialist_chef', name: 'Specialist-/Chefsposition', category: "Arbete", duration: 10, costs: { time: 70, social: -5 }, requirements: { age_min: 30, education_level: ['högskola_kandidat', 'högskola_master'], capital_min: {cultural: 70, social: 40, symbolic: 20} }, benefits: { capital: { economic: 350, symbolic: 30 }, stats: { happiness: -5, health: -10, career_prospects: 30 } }, outcomes: { constraints: { hasJob: true } }, description: 'Ansvarsfullt och välbetalt, men ofta krävande.' },
+            work_eget_foretag: { id: 'work_eget_foretag', name: 'Starta Eget Företag', category: "Arbete", duration: 6, costs: { economic: 100, time: 75, social: -10 }, requirements: { age_min: 25, capital_min:{ economic: 80, cultural: 30 } }, benefits: { capital: { economic: 250, symbolic: 25 }, stats: { happiness: 10, health: -10 } }, outcomes: { constraints: { hasJob: true } }, description: 'Riskfyllt men med chans till stor frihet och förtjänst.' },
+            work_gig_frilans: { id: 'work_gig_frilans', name: 'Gig-arbete/Frilans', category: "Arbete", duration: 4, costs: { time: 40 }, requirements: { age_min: 20 }, benefits: { capital: { economic: 100 }, stats: { happiness: 5, career_prospects: 10 } }, outcomes: { constraints: { hasJob: true } }, description: 'Flexibelt men ofta osäkert, projektbaserat arbete.' },
+            
+            // FAMILJ
+            family_partner: { id: 'family_partner', name: 'Skaffa Fast Partner', category: "Familj", duration: 1, costs: { time: 20, economic: 10 }, requirements: { age_min: 18, capital_min: { social: 20 } }, benefits: { stats: { happiness: 20, health: 5 }, capital: { social: 15 } }, outcomes: { constraints: { hasFamily: true } }, description: 'Inled en seriös och varaktig relation.' },
+            family_sambo_gifta: { id: 'family_sambo_gifta', name: 'Bli Sambo/Gifta Sig', category: "Familj", duration: 1, costs: { economic: 40, time: 10 }, requirements: { age_min: 20, constraints_is: { hasFamily: true } }, benefits: { stats: { happiness: 15 }, capital: { social: 10, symbolic: 10 } }, outcomes: { constraints: { isMarried: true } }, description: 'Formalisera förhållandet och flytta ihop.', unique: true },
+            family_barn: { id: 'family_barn', name: 'Skaffa Barn', category: "Familj", duration: 5, costs: { economic: 100, time: 50, happiness: -15 }, requirements: { age_min: 22, age_max: 45, constraints_is: { hasFamily: true } }, benefits: { stats: { happiness: 40 }, capital: { social: 20, symbolic: 5 } }, outcomes: { constraints: { hasChildren: true } }, description: 'Utöka familjen. En stor omställning och glädje.' }, // Kan göras flera gånger, men effekten kanske minskar?
+            family_husdjur: { id: 'family_husdjur', name: 'Skaffa Husdjur', category: "Familj", duration: 0, costs: {economic: 15, time: 10}, requirements: { age_min: 16 }, benefits: { stats: {happiness: 10, health: 5}, capital: {social: 5}}, description: "En fyrbent (eller annan) vän i familjen."},
+            family_boende_hyresratt: { id: 'family_boende_hyresratt', name: 'Flytta till Hyresrätt', category: "Familj", duration: 0, costs: { economic: 30 }, requirements: { age_min: 18 }, benefits: { stats: { happiness: 5 } }, outcomes: { constraints: { currentHousing: "Hyresrätt" } }, description: 'Skaffa eget boende, flexibelt men ingen investering.'},
+            family_boende_bostadsratt: { id: 'family_boende_bostadsratt', name: 'Köpa Bostadsrätt', category: "Familj", duration: 1, costs: { economic: 180, time: 10 }, requirements: { age_min: 23, constraints_is: {hasJob: true}, capital_min: {economic: 100} }, benefits: { capital: { economic: 20, symbolic: 15 }, stats: { happiness: 10 } }, outcomes: { constraints: { currentHousing: "Bostadsrätt" } }, description: 'Investera i ett eget hem.', unique: true},
+            family_boende_villa: { id: 'family_boende_villa', name: 'Köpa Villa/Radhus', category: "Familj", duration: 2, costs: { economic: 300, time: 20 }, requirements: { age_min: 28, constraints_is: {hasJob: true, hasFamily: true}, capital_min: {economic: 200} }, benefits: { capital: { economic: 40, symbolic: 25 }, stats: { happiness: 15 } }, outcomes: { constraints: { currentHousing: "Villa/Radhus" } }, description: 'Det stora familjeboendet.', unique: true},
+
+            // FRITID
+            fritid_traning: { id: 'fritid_traning', name: 'Regelbunden Träning', category: "Fritid", duration: 0, costs: { economic: 10, time: 15 }, requirements: {}, benefits: { stats: { health: 20, happiness: 10 } }, blocked_by_if: { hasChildren: { time_cost_increase_factor: 1.5, effort_time_cost_increase_factor: 1.3 } }, description: 'Håll dig aktiv för bättre hälsa och välmående.' },
+            fritid_hobby: { id: 'fritid_hobby', name: 'Intensiv Hobbyverksamhet', category: "Fritid", duration: 0, costs: { economic: 20, time: 15 }, requirements: {}, benefits: { stats: { happiness: 15 }, capital: { cultural: 10, social: 5 } }, reduced_by_if: { hasFamily: { time_cost_increase_factor: 1.2, effort_time_cost_increase_factor: 1.2 } }, description: 'Odla ett djupt intresse, t.ex. musik, konst, idrott.' },
+            fritid_resa_utomlands: { id: 'fritid_resa_utomlands', name: 'Stor Resa Utomlands', category: "Fritid", duration: 0, costs: { economic: 100, time: 10 }, requirements: { capital_min:{ economic: 80 } }, benefits: { stats: { happiness: 25 }, capital: { cultural: 15 } }, blocked_by_if: { hasChildren: { probability_decrease_factor: 0.6 } }, description: 'Upptäck världen och vidga dina vyer (1-2 månader).' },
+            fritid_personlig_utveckling: { id: 'fritid_personlig_utveckling', name: 'Kurs i Personlig Utveckling', category: "Fritid", duration: 0, costs: { economic: 50, time: 10 }, requirements: {}, benefits: { stats: { happiness: 15, health: 5 }, capital: {cultural: 5} }, description: 'Investera i dig själv (t.ex. mindfulness, ledarskap, terapi).' },
+            fritid_vanner: { id: 'fritid_vanner', name: 'Underhålla Vänskapsrelationer', category: "Fritid", duration: 0, costs: { time: 15, economic: 10 }, requirements: {}, benefits: { stats: { happiness: 15 }, capital: { social: 20 } }, description: 'Investera tid i dina vänner och sociala nätverk.'},
+
+            // KULTURELLT ENGAGEMANG
+            kultur_forening: { id: 'kultur_forening', name: 'Engagemang i Förening', category: "Kulturellt engagemang", duration: 2, costs: { time: 15, economic: 5 }, requirements: {}, benefits: { capital: { social: 15, cultural: 5, symbolic: 5 }, stats: { happiness: 10 } }, description: 'Delta aktivt i en idrottsförening, kulturförening, eller intresseorganisation.' },
+            kultur_politik: { id: 'kultur_politik', name: 'Politiskt Engagemang (Lokalt)', category: "Kulturellt engagemang", duration: 3, costs: { time: 20 }, requirements: { capital_min: { cultural: 20 } }, benefits: { capital: { social: 10, symbolic: 15 }, stats: { happiness: 5 } }, description: 'Bli aktiv i ett politiskt parti eller en intresseorganisation på lokal nivå.' },
+            kultur_volontar: { id: 'kultur_volontar', name: 'Volontärarbete', category: "Kulturellt engagemang", duration: 1, costs: { time: 15 }, requirements: {}, benefits: { capital: { social: 15, symbolic: 5 }, stats: { happiness: 15 } }, description: 'Gör en ideell insats för ett gott ändamål.' },
+            kultur_konsumtion: { id: 'kultur_konsumtion', name: 'Regelbunden Kulturkonsumtion', category: "Kulturellt engagemang", duration: 0, costs: { economic: 20, time: 10 }, requirements: {}, benefits: { capital: { cultural: 15 }, stats: { happiness: 10 } }, description: 'Besök ofta teatrar, konserter, museer, läs böcker.' },
         };
         
         const projectCategories = {
-            'Utbildning': {
-                color: '#007bff',
-                projects: [
-                    { id: 'edu1', name: 'Gymnasium', duration: 3, costs: { economic: 10, time: 30, cultural: -5 }, requirements: { age_min: 15 }, benefits: { cultural: 30, symbolic: 5 }, outcomes: { education_level: 'gymnasium' }, description: 'Högskoleförberedande eller yrkesinriktad utbildning.' },
-                    { id: 'edu2', name: 'Universitetsstudier (grund)', duration: 3, costs: { economic: 30, time: 40, cultural: -10 }, requirements: { education_level: 'gymnasium', cultural: 40 }, benefits: { cultural: 50, symbolic: 20, happiness: 5 }, outcomes: { education_level: 'högskola' }, description: 'Grundläggande akademisk examen.' },
-                    { id: 'edu3', name: 'Universitetsstudier (avancerad)', duration: 2, costs: { economic: 20, time: 30, cultural: -5 }, requirements: { education_level: 'högskola', cultural: 70 }, benefits: { cultural: 30, symbolic: 15 }, outcomes: { education_level: 'avancerad högskola' }, description: 'Masterexamen eller motsvarande.' },
-                    { id: 'edu4', name: 'Yrkesskola/Folkhögskola', duration: 2, costs: { economic: 15, time: 25 }, requirements: { age_min: 18 }, benefits: { cultural: 20, social: 10 }, outcomes: { education_level: 'yrkesutbildning' }, description: 'Praktisk utbildning för ett specifikt yrke.' },
-                    { id: 'edu5', name: 'Kvällskurs/Kompetensutveckling', duration: 1, costs: { economic: 20, time: 10 }, requirements: {}, benefits: { cultural: 15, happiness: 5 }, description: 'Förbättra dina färdigheter.' }
-                ]
-            },
-            'Arbete': {
-                color: '#28a745',
-                projects: [
-                    { id: 'work1', name: 'Enklare arbete (Deltid)', duration: 5, costs: { time: 25 }, requirements: { age_min: 16 }, benefits: { economic: 60, social: 5 }, outcomes: { hasJob: true }, description: 'Första steget in på arbetsmarknaden.' },
-                    { id: 'work2', name: 'Kvalificerat arbete', duration: 8, costs: { time: 50 }, requirements: { age_min: 20, education_level: ['gymnasium', 'yrkesutbildning','högskola'] }, benefits: { economic: 150, career: 20, symbolic: 10 }, outcomes: { hasJob: true }, description: 'Stabil anställning med utvecklingsmöjligheter.' },
-                    { id: 'work3', name: 'Specialist/Chefsposition', duration: 10, costs: { time: 60 }, requirements: { age_min: 28, education_level: ['högskola', 'avancerad högskola'], cultural: 60, social: 40 }, benefits: { economic: 250, career: 30, symbolic: 25, happiness: -5 }, outcomes: { hasJob: true }, description: 'Krävande men välbetalt arbete.' },
-                    { id: 'work4', name: 'Starta Eget Företag', duration: 6, costs: { economic: 100, time: 70, social: -10 }, requirements: { age_min: 25, cultural: 40, economic: 50 }, benefits: { economic: 200, career: 25, symbolic: 20, happiness: 10, health: -5 }, outcomes: { hasJob: true }, description: 'Riskfyllt men potentiellt givande.' },
-                    { id: 'work5', name: 'Gig-arbete/Frilans', duration: 4, costs: { time: 30 }, requirements: { age_min: 18 }, benefits: { economic: 80, happiness: 5 }, outcomes: { hasJob: true }, description: 'Flexibelt men osäkert.' }
-                ]
-            },
-            'Relationer': {
-                color: '#dc3545',
-                projects: [
-                    { id: 'rel1', name: 'Skaffa Partner', duration: 2, costs: { time: 20, economic: 10 }, requirements: { age_min: 18 }, benefits: { happiness: 20, social: 15, health: 5 }, outcomes: { hasFamily: true }, description: 'Inled en seriös relation.' },
-                    { id: 'rel2', name: 'Gifta sig/Bli sambo', duration: 1, costs: { economic: 30, time: 10 }, requirements: { hasFamily: true }, benefits: { happiness: 15, symbolic: 10, social: 5 }, outcomes: { isMarried: true }, description: 'Formalisera förhållandet.' },
-                    { id: 'rel3', name: 'Skaffa Barn', duration: 5, costs: { economic: 80, time: 40, happiness: -10 }, requirements: { hasFamily: true, age_min: 22, age_max: 45 }, benefits: { happiness: 30, social: 10, symbolic: 5 }, outcomes: { hasChildren: true }, description: 'Utöka familjen.' },
-                    { id: 'rel4', name: 'Underhålla Vänskap', duration: 0, costs: { time: 15, economic: 10 }, requirements: {}, benefits: { happiness: 10, social: 20 }, description: 'Investera i ditt sociala nätverk.' },
-                    { id: 'rel5', name: 'Gå med i Förening', duration: 0, costs: { time: 10, economic: 5 }, requirements: {}, benefits: { social: 15, happiness: 5, cultural: 5 }, description: 'Delta i gemensamma aktiviteter.' }
-                ]
-            },
-            'Boende': {
-                color: '#fd7e14',
-                projects: [
-                    { id: 'house1', name: 'Hyra Lägenhet', duration: 0, costs: { economic: 40 }, requirements: {}, benefits: { happiness: 5 }, description: 'Flexibelt boende.' },
-                    { id: 'house2', name: 'Köpa Bostadsrätt', duration: 0, costs: { economic: 150 }, requirements: { economic: 100, hasJob: true }, benefits: { economic: 20, happiness: 10, symbolic: 15 }, description: 'Investera i ditt boende.' },
-                    { id: 'house3', name: 'Köpa Villa/Radhus', duration: 0, costs: { economic: 250 }, requirements: { economic: 200, hasJob: true, hasFamily: true }, benefits: { economic: 30, happiness: 15, symbolic: 20 }, description: 'För den växande familjen.' },
-                    { id: 'house4', name: 'Flytta till Större Stad', duration: 1, costs: { economic: 30, time: 10, social: -5 }, requirements: {}, benefits: { cultural: 10, career: 5 }, description: 'Sök nya möjligheter.' },
-                    { id: 'house5', name: 'Flytta till Mindre Ort', duration: 1, costs: { economic: -10, time: 5, social: -5 }, requirements: {}, benefits: { happiness: 5, health: 5 }, description: 'Närmare naturen, lugnare tempo.' }
-                ]
-            },
-            'Hälsa & Fritid': {
-                color: '#6f42c1',
-                projects: [
-                    { id: 'lei1', name: 'Regelbunden Träning', duration: 0, costs: { economic: 10, time: 15 }, requirements: {}, benefits: { health: 20, happiness: 10 }, blocked_by_if: { hasChildren: { time_cost_increase_factor: 1.5 } }, description: 'Håll dig i form.' },
-                    { id: 'lei2', name: 'Hobbyverksamhet', duration: 0, costs: { economic: 15, time: 10 }, requirements: {}, benefits: { happiness: 15, cultural: 5 }, reduced_by_if: { hasFamily: { time_cost_increase_factor: 1.2 } }, description: 'Odla dina intressen.' },
-                    { id: 'lei3', name: 'Resa Utomlands', duration: 1, costs: { economic: 80, time: 10 }, requirements: { economic: 60 }, benefits: { happiness: 25, cultural: 15 }, blocked_by_if: { hasChildren: { probability_decrease_factor: 0.5 } }, description: 'Upptäck världen.' },
-                    { id: 'lei4', name: 'Personlig Utveckling (Terapi/Coaching)', duration: 1, costs: { economic: 50, time: 5 }, requirements: {}, benefits: { happiness: 15, health: 5 }, description: 'Investera i ditt välmående.' },
-                    { id: 'lei5', name: 'Semester i Sverige', duration: 1, costs: { economic: 30, time: 5 }, requirements: {}, benefits: { happiness: 10, health: 5 }, description: 'Koppla av på hemmaplan.' }
-                ]
-            },
-             'Samhälle & Kultur': {
-                color: '#20c997',
-                projects: [
-                    { id: 'soc1', name: 'Politiskt Engagemang', duration: 2, costs: { time: 15, economic: 5 }, requirements: { cultural: 30 }, benefits: { social: 10, symbolic: 10, happiness: 5 }, description: 'Påverka samhället.' },
-                    { id: 'soc2', name: 'Volontärarbete', duration: 1, costs: { time: 10 }, requirements: {}, benefits: { social: 15, happiness: 10, symbolic: 5 }, description: 'Gör en insats för andra.' },
-                    { id: 'soc3', name: 'Kulturkonsumtion (Teater, Museum etc.)', duration: 0, costs: { economic: 15, time: 5 }, requirements: {}, benefits: { cultural: 10, happiness: 5 }, description: 'Utvidga dina vyer.' }
-                ]
-            }
+            "Utbildning": { color: '#007bff', projects: [] },
+            "Arbete": { color: '#28a745', projects: [] },
+            "Familj": { color: '#dc3545', projects: [] },
+            "Fritid": { color: '#6f42c1', projects: [] },
+            "Kulturellt engagemang": { color: '#20c997', projects: [] }
         };
 
-        const randomEventTypes = {
+        // Populate categories from projectData
+        for (const projectId in projectData) {
+            const project = projectData[projectId];
+            if (projectCategories[project.category]) {
+                projectCategories[project.category].projects.push(project);
+            }
+        }
+
+
+        const randomEventTypes = { // Probabilities are per decade
             positive: [
-                { title: 'Oväntat arv', description: 'En avlägsen släkting har testamenterat en summa pengar till dig.', effects: { capital: { economic: 75 }, stats: { happiness: 10 } }, probability: 0.03, class_modifier: { 'Överklass': 1.5, 'Arbetarklass': 0.8 } },
-                { title: 'Jobberbjudande via nätverk', description: 'En kontakt tipsar om ett spännande jobb som passar dig perfekt.', effects: { capital: { career: 10, social: 5, symbolic: 5 } }, probability: 0.05, requirements: { capital_min: { social: 30 } } },
-                { title: 'Nyckelperson i ditt liv', description: 'Du träffar någon som blir en viktig vän eller mentor.', effects: { capital: { social: 15 }, stats: { happiness: 10 } }, probability: 0.08 },
-                { title: 'Stipendium/Bidrag', description: 'Du beviljas ekonomiskt stöd för en utbildning eller ett projekt.', effects: { capital: { economic: 40, cultural: 5 } }, probability: 0.04, requirements: { constraints_any: {education_level: ['gymnasium', 'högskola'] } } },
-                { title: 'Lottovinst', description: 'Turen är på din sida! En mindre lottovinst.', effects: { capital: { economic: 25 }, stats: { happiness: 5 } }, probability: 0.02 }
+                { title: 'Oväntat arv', description: 'En avlägsen släkting har testamenterat en summa pengar till dig.', effects: { capital: { economic: 100 }, stats: { happiness: 10 } }, probability: 0.04, class_modifier: { 'Överklass': 1.8, 'Arbetarklass': 0.7 } },
+                { title: 'Vinn på Trisslott', description: 'Plötsligt händer det! En mindre summa pengar.', effects: { capital: { economic: 30 }, stats: { happiness: 5 } }, probability: 0.05 },
+                { title: 'Ny Vänskap För Livet', description: 'Du träffar någon som blir en ovärderlig vän och stöttepelare.', effects: { capital: { social: 20 }, stats: { happiness: 15 } }, probability: 0.08 },
+                { title: 'Befordran på Jobbet', description: 'Ditt hårda arbete lönar sig, du erbjuds en bättre position.', effects: { capital: { economic: 50, symbolic: 15 }, stats: { career_prospects: 10 } }, probability: 0.05, requirements: { constraints_is: { hasJob: true } } },
+                { title: 'Inspirerande Kulturupplevelse', description: 'En bok, film eller konsert berör dig djupt och vidgar dina vyer.', effects: { capital: { cultural: 10 }, stats: { happiness: 5 } }, probability: 0.07 }
             ],
             negative: [
-                { title: 'Sjukdomsperiod', description: 'Du drabbas av en sjukdom som påverkar din arbetsförmåga och hälsa.', effects: { stats: { health: -15, happiness: -10 }, capital: { economic: -20, time: -10 } }, probability: 0.06 },
-                { title: 'Varsel på jobbet', description: 'Företaget går dåligt och du blir varslad om uppsägning.', effects: { capital: { career: -15, economic: -30 }, stats: { happiness: -15 } }, probability: 0.04, requirements: { constraints_is: { hasJob: true } }, class_modifier: { 'Arbetarklass': 1.3, 'Överklass': 0.7 } },
-                { title: 'Relationskonflikt', description: 'En konflikt uppstår i en nära relation.', effects: { stats: { happiness: -10 }, capital: { social: -10 } }, probability: 0.07 },
-                { title: 'Ekonomisk motgång', description: 'Oväntade utgifter eller en dålig investering drabbar din ekonomi.', effects: { capital: { economic: -50 }, stats: { happiness: -5 } }, probability: 0.05 },
-                { title: 'Global lågkonjunktur', description: 'En internationell ekonomisk nedgång påverkar jobbmöjligheter och investeringar.', effects: { capital: { economic: -40, career: -5 } }, probability: 0.03, decade_modifier: { 3: 1.5, 4: 1.2 } } // Mer sannolikt på 90-talet & 00-talet
+                { title: 'Långvarig Sjukdom', description: 'Du drabbas av en sjukdom som påverkar dig under en längre tid.', effects: { stats: { health: -20, happiness: -15 }, capital: { economic: -30, time: -15 } }, probability: 0.05 },
+                { title: 'Arbetslöshet', description: 'Företaget skär ner och du blir tyvärr uppsagd.', effects: { capital: { career_prospects: -10, economic: -50 }, stats: { happiness: -20 }, outcomes: { constraints: { hasJob: false } } }, probability: 0.04, requirements: { constraints_is: { hasJob: true } }, class_modifier: { 'Arbetarklass': 1.3, 'Övre medelklass/Akademiker': 0.8 } },
+                { title: 'Relationsproblem', description: 'En nära relation knakar i fogarna, vilket orsakar stress.', effects: { stats: { happiness: -15 }, capital: { social: -10 } }, probability: 0.07, requirements: { constraints_is: { hasFamily: true } } },
+                { title: 'Ekonomisk Stöld/Förlust', description: 'Du råkar ut för en stöld eller en oväntad ekonomisk förlust.', effects: { capital: { economic: -60 }, stats: { happiness: -10 } }, probability: 0.03 },
+                { title: 'Utbrändhet', description: 'Stress och höga krav leder till att du känner dig helt slutkörd.', effects: { stats: { health: -15, happiness: -10 }, capital: { time: -20 } }, probability: 0.05, requirements: { constraints_is: { hasJob: true } } }
             ],
-            neutral: [
-                { title: 'Flytt till ny stad', description: 'En jobbmöjlighet eller personliga skäl leder till en flytt.', effects: { capital: { social: -5, cultural: 5 } }, probability: 0.05 },
-                { title: 'Teknologisk förändring', description: 'Ny teknik förändrar din bransch eller vardag.', effects: { capital: { cultural: 5 } }, probability: 0.06, decade_modifier: { 2: 1.2, 3: 1.5, 4: 1.8, 5: 2.0 } }, // Mer sannolikt i senare decennier
-                { title: 'Samhällsdebatt engagerar', description: 'En aktuell samhällsfråga väcker ditt intresse.', effects: { capital: { cultural: 5 } }, probability: 0.07 }
+            neutral: [ // Often lead to choices or minor shifts
+                { title: 'Flyttmöjlighet', description: 'En möjlighet att flytta till en annan del av landet dyker upp.', effects: { capital: { social: -5 } }, probability: 0.06 }, // Could trigger a choice event
+                { title: 'Nytt Samhällsintresse', description: 'En aktuell samhällsfråga eller ny hobby fångar ditt intresse.', effects: { capital: { cultural: 5 } }, probability: 0.08 },
+                { title: 'Teknologisk Skifte', description: 'Ny teknik förändrar hur du arbetar eller lever din vardag.', effects: { capital: { cultural: 5 } }, probability: 0.07, decade_modifier: { 2: 1.2, 3: 1.5, 4: 1.8, 5: 2.0 } }
             ]
         };
 
         // --- UI HELPER FUNCTIONS ---
         function showScreen(screenId) {
-            document.getElementById('introScreen').style.display = 'none';
-            document.getElementById('characterScreen').style.display = 'none';
-            document.getElementById('gameplayScreen').style.display = 'none';
-            document.getElementById('reflectionScreen').style.display = 'none';
-            document.getElementById('summaryScreen').style.display = 'none';
+            ['introScreen', 'characterScreen', 'gameplayScreen', 'reflectionScreen', 'summaryScreen'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = 'none';
+            });
             if (document.getElementById(screenId)) {
                 document.getElementById(screenId).style.display = 'block';
             }
@@ -682,7 +793,7 @@
         }
 
         function showModal(modalId, title, description) {
-            document.getElementById(modalId).style.display = 'flex';
+            document.getElementById(modalId).style.display = 'flex'; // Use flex for centering
             if (title) document.getElementById(modalId.replace('Modal', 'Title')).innerText = title;
             if (description) document.getElementById(modalId.replace('Modal', 'Description')).innerText = description;
         }
@@ -697,8 +808,9 @@
             }
             return items[items.length - 1];
         }
-
-        function createCharacter() {
+        
+        function showCharacterCreation() {
+            gameState = getDefaultGameState(); // Initialize/reset gameState
             const gender = Math.random() < 0.5 ? 'Kvinna' : 'Man';
             const birthplace = weightedRandom(swedishCities);
             const socialClass = weightedRandom(socialClasses);
@@ -709,67 +821,78 @@
                 socialClass: socialClass.name,
                 region: birthplace.region,
                 opportunitiesModifier: socialClass.opportunitiesModifier,
-                classDetails: socialClass // Store full class details
+                classDetails: socialClass,
+                lifeGoal: null // To be set by player
             };
 
-            // Set initial capital based on social class
             Object.assign(gameState.capital, socialClass.initialCapital);
-            gameState.capital.time = INITIAL_TIME_PER_DECADE; // Reset time for the first decade
+            gameState.capital.time = INITIAL_EFFORT_TIME_PER_DECADE;
 
             const infoDiv = document.getElementById('characterInfo');
             infoDiv.innerHTML = `
-                <h3>Din start i livet:</h3>
+                <h3>Din start i livet (Ålder: ${gameState.age}):</h3>
                 <p><strong>Kön:</strong> ${gameState.character.gender}</p>
                 <p><strong>Födelseort:</strong> ${gameState.character.birthplace} (${gameState.character.region})</p>
                 <p><strong>Social bakgrund:</strong> ${gameState.character.socialClass}</p>
                 <div class="character-stats">
-                    <div class="stat-item"><strong>Ekonomiskt Kapital:</strong> ${gameState.capital.economic}</div>
-                    <div class="stat-item"><strong>Kulturellt Kapital:</strong> ${gameState.capital.cultural}</div>
-                    <div class="stat-item"><strong>Socialt Kapital:</strong> ${gameState.capital.social}</div>
-                    <div class="stat-item"><strong>Symboliskt Kapital:</strong> ${gameState.capital.symbolic}</div>
+                    <div class="stat-item"><strong>Ekonomiskt:</strong> ${gameState.capital.economic}</div>
+                    <div class="stat-item"><strong>Kulturellt:</strong> ${gameState.capital.cultural}</div>
+                    <div class="stat-item"><strong>Socialt:</strong> ${gameState.capital.social}</div>
+                    <div class="stat-item"><strong>Symboliskt:</strong> ${gameState.capital.symbolic}</div>
                 </div>
             `;
-        }
-
-        // --- GAME FLOW ---
-        function startGame() {
-            gameState = getDefaultGameState();
-            createCharacter();
             showScreen('characterScreen');
         }
-        
+
+        function confirmCharacterAndGoal() {
+            const selectedGoal = document.querySelector('input[name="lifeGoal"]:checked');
+            if (selectedGoal) {
+                gameState.character.lifeGoal = selectedGoal.value;
+            } else {
+                // Default goal if none selected, though radio buttons usually have a default checked
+                gameState.character.lifeGoal = 'happiness'; 
+            }
+            startFirstDecade();
+        }
+
+
+        // --- GAME FLOW ---
         function restartGame() {
-            gameState = getDefaultGameState(); // Reset game state
-            showScreen('introScreen');
+            showScreen('introScreen'); // Will reset gameState when "Börja din resa" is clicked
         }
 
         function startFirstDecade() {
             gameState.currentDecadeIndex = 0;
-            gameState.age = 10; // Start age for the first decade planning (e.g. teens)
+            // Auto-assign grundskola if character is of age, this is a simplification
+            const grundskola = projectData.edu_grundskola_avslutad;
+            if (gameState.age >= grundskola.requirements.age_min && !gameState.completedUniqueProjectIds.has(grundskola.id)) {
+                applyProjectEffects(grundskola, gameState.decadeLog[0] = { projects: [], events: [] }); // Apply its effects directly
+                gameState.completedUniqueProjectIds.add(grundskola.id);
+                gameState.allCompletedProjects.push({name: grundskola.name, decade: -1}); // Mark as pre-game
+            }
             setupDecade();
         }
         
         function setupDecade() {
-            gameState.age += 10; // Character ages 10 years each decade
-            gameState.capital.time = INITIAL_TIME_PER_DECADE; // Reset time budget for the decade
-            gameState.currentDecadeProjects = []; // Clear projects from previous decade
+            gameState.age += 10; 
+            gameState.capital.time = INITIAL_EFFORT_TIME_PER_DECADE; 
+            gameState.currentDecadeProjects = []; 
+            gameState.currentDecadeProjectDurations = [];
             if (!gameState.decadeLog[gameState.currentDecadeIndex]) {
                  gameState.decadeLog[gameState.currentDecadeIndex] = { projects: [], events: [] };
             }
 
-
             document.getElementById('decadeHeader').innerHTML = `
                 <h2>${gameState.decades[gameState.currentDecadeIndex]} (Ålder: ${gameState.age}-${gameState.age+9})</h2>
-                <p>Planera dina kommande 10 år.</p>
+                <p>Planera dina kommande 10 år. Ditt livsmål: ${lifeGoalsData[gameState.character.lifeGoal]?.name || 'Inget valt'}</p>
             `;
             updateCharacterDisplay();
             renderHistoricalEvents();
             renderProjects();
-            updateCurrentProjectsDisplay(); // Ensure it's cleared initially
+            renderTimelineSlots(); // Initial render of empty slots
+            updateCurrentProjectsListDisplay(); 
             
-            // Trigger random events at the start of the decade
             triggerRandomEvents();
-
             showScreen('gameplayScreen');
         }
 
@@ -786,21 +909,22 @@
             const displayDiv = document.getElementById('characterDisplay');
             let capitalHTML = '<div class="character-stats">';
             for (const [key, value] of Object.entries(gameState.capital)) {
-                capitalHTML += `<div class="stat-item"><strong>${key.charAt(0).toUpperCase() + key.slice(1)}:</strong> ${value}</div>`;
+                capitalHTML += `<div class="stat-item"><strong>${key.charAt(0).toUpperCase() + key.slice(1)}:</strong> ${Math.round(value)}</div>`;
             }
             capitalHTML += '</div>';
 
             let statsHTML = '<div class="character-stats" style="margin-top:10px;">';
              for (const [key, value] of Object.entries(gameState.stats)) {
-                statsHTML += `<div class="stat-item"><strong>${key.charAt(0).toUpperCase() + key.slice(1)}:</strong> ${value}</div>`;
+                statsHTML += `<div class="stat-item"><strong>${key.charAt(0).toUpperCase() + key.slice(1)}:</strong> ${Math.round(value)}</div>`;
             }
             statsHTML += '</div>';
 
             let constraintsHTML = '<div style="margin-top:10px; font-size:0.9em;"><strong>Nuvarande status:</strong> ';
-            constraintsHTML += `Utbildning: ${gameState.constraints.education_level}, `;
+            constraintsHTML += `Utbildning: ${gameState.constraints.education_level.replace("_", " ")}, `;
             constraintsHTML += `Jobb: ${gameState.constraints.hasJob ? 'Ja' : 'Nej'}, `;
             constraintsHTML += `Gift/Sambo: ${gameState.constraints.isMarried ? 'Ja' : 'Nej'}, `;
-            constraintsHTML += `Barn: ${gameState.constraints.hasChildren ? 'Ja' : 'Nej'}`;
+            constraintsHTML += `Barn: ${gameState.constraints.hasChildren ? 'Ja' : 'Nej'}, `;
+            constraintsHTML += `Boende: ${gameState.constraints.currentHousing}`;
             constraintsHTML += '</div>';
 
             displayDiv.innerHTML = `
@@ -812,19 +936,25 @@
                 ${statsHTML}
                 ${constraintsHTML}
             `;
-            document.getElementById('timeSpent').innerText = gameState.currentDecadeProjects.reduce((sum, p) => sum + p.costs.time, 0);
-            document.getElementById('totalTimePerDecade').innerText = INITIAL_TIME_PER_DECADE;
+            const totalEffortTimeSpent = gameState.currentDecadeProjectDurations.reduce((sum, p) => sum + getAdjustedProjectCost(p.project, 'time'), 0);
+            document.getElementById('timeSpent').innerText = totalEffortTimeSpent;
+            document.getElementById('totalTimePerDecade').innerText = INITIAL_EFFORT_TIME_PER_DECADE;
+
+            const totalYearsFilled = gameState.currentDecadeProjectDurations.reduce((sum, p) => sum + p.project.duration, 0);
+            document.getElementById('yearsFilled').innerText = totalYearsFilled;
         }
 
         function renderHistoricalEvents() {
             const eventsContainer = document.getElementById('historicalEventsDisplay');
-            const decadeEvents = historicalEventsData[gameState.currentDecadeIndex];
-            if (decadeEvents) {
-                let html = `<h3>Historiska händelser: ${decadeEvents.title}</h3><ul>`;
-                decadeEvents.events.forEach(event => {
-                    html += `<li>${event}</li>`;
+            const decadeEventsData = historicalEventsData[gameState.currentDecadeIndex];
+            if (decadeEventsData) {
+                let html = `<h3>Samhällsklimat och Händelser: ${decadeEventsData.title}</h3><ul>`;
+                decadeEventsData.events.forEach(eventText => {
+                    html += `<li>${eventText}</li>`;
                 });
                 html += `</ul>`;
+                // Optionally display modifiers if desired:
+                // if(decadeEventsData.modifiers) html += `<small>Påverkan: ${JSON.stringify(decadeEventsData.modifiers)}</small>`;
                 eventsContainer.innerHTML = html;
                 eventsContainer.style.display = 'block';
             } else {
@@ -832,11 +962,44 @@
             }
         }
 
-        // --- PROJECT HANDLING ---
+        // --- TIMELINE & PROJECT HANDLING ---
+        function renderTimelineSlots() {
+            const slotsContainer = document.getElementById('timelineSlots');
+            slotsContainer.innerHTML = ''; // Clear existing slots
+            let currentYear = 0;
+            
+            gameState.currentDecadeProjectDurations.forEach(item => {
+                for (let y = 0; y < item.project.duration; y++) {
+                    if (currentYear < YEARS_PER_DECADE) {
+                        const slotDiv = document.createElement('div');
+                        slotDiv.className = 'timeline-slot project-year';
+                        slotDiv.style.backgroundColor = projectCategories[item.project.category]?.color || '#ccc';
+                        slotDiv.style.flexGrow = 1; // Make projects take up proportional space if fewer than 10 years
+                        slotDiv.textContent = `${item.project.name.substring(0,10)}... (År ${y+1})`;
+                        slotDiv.title = `${item.project.name} (År ${y+1} av ${item.project.duration})`;
+                        slotsContainer.appendChild(slotDiv);
+                        currentYear++;
+                    }
+                }
+            });
+
+            // Fill remaining years with empty slots
+            for (let y = currentYear; y < YEARS_PER_DECADE; y++) {
+                const slotDiv = document.createElement('div');
+                slotDiv.className = 'timeline-slot';
+                slotDiv.style.flexGrow = 1;
+                slotDiv.textContent = `År ${y + 1} Ledigt`;
+                slotsContainer.appendChild(slotDiv);
+            }
+        }
+        
         function meetsRequirements(project) {
             // Age requirement
             if (project.requirements.age_min && gameState.age < project.requirements.age_min) return false;
             if (project.requirements.age_max && gameState.age > project.requirements.age_max) return false;
+            
+            // Unique project check
+            if (project.unique && gameState.completedUniqueProjectIds.has(project.id)) return false;
 
             // Capital requirements
             if (project.requirements.capital_min) {
@@ -844,65 +1007,76 @@
                     if (gameState.capital[cap_type] < project.requirements.capital_min[cap_type]) return false;
                 }
             }
-             // Resource costs (economic, time)
-            if (project.costs.economic && gameState.capital.economic < project.costs.economic) return false;
-             // We don't check time cost here, but rather when adding.
-
+            
             // Education level requirement
             if (project.requirements.education_level) {
                 const currentLevel = gameState.constraints.education_level;
                 const requiredLevels = Array.isArray(project.requirements.education_level) ? project.requirements.education_level : [project.requirements.education_level];
-                if (!requiredLevels.includes(currentLevel)) {
-                     // Allow higher education if current level is part of a hierarchy
-                    const eduHierarchy = ['grundskola', 'gymnasium', 'yrkesutbildning', 'högskola', 'avancerad högskola'];
-                    let currentIdx = eduHierarchy.indexOf(currentLevel);
-                    let requiredIdx = Math.min(...requiredLevels.map(rl => eduHierarchy.indexOf(rl)));
-                    if (currentIdx < requiredIdx) return false;
+                
+                const eduHierarchy = ['ingen', 'grundskola', 'grundskola_avslutad', 'folkhögskola', 'gymnasium', 'yrkeshögskola', 'högskola_kandidat', 'högskola_master'];
+                let currentIdx = eduHierarchy.indexOf(currentLevel);
+                let meetsEduReq = false;
+                for(const reqLevel of requiredLevels){
+                    if (eduHierarchy.indexOf(reqLevel) <= currentIdx) {
+                        meetsEduReq = true;
+                        break;
+                    }
                 }
+                if(!meetsEduReq) return false;
             }
             
-            // Other specific capital type requirements (e.g. cultural for some studies)
-            if (project.requirements.cultural && gameState.capital.cultural < project.requirements.cultural) return false;
-            if (project.requirements.social && gameState.capital.social < project.requirements.social) return false;
-
             // Constraint requirements (e.g., must be married, must have job)
             if (project.requirements.constraints_is) {
                 for (const key in project.requirements.constraints_is) {
                     if (gameState.constraints[key] !== project.requirements.constraints_is[key]) return false;
                 }
             }
-             // Specific constraints (e.g. hasFamily, hasJob) from gameState.constraints
-            if (project.requirements.hasFamily && !gameState.constraints.hasFamily) return false;
-            if (project.requirements.hasJob && !gameState.constraints.hasJob) return false;
+            // Prerequisite project
+            if (project.requirements.prerequisite_project && !gameState.completedUniqueProjectIds.has(project.requirements.prerequisite_project)) return false;
 
 
             // Check blocked_by_if conditions
             if (project.blocked_by_if) {
                 for (const constraintKey in project.blocked_by_if) {
-                    if (gameState.constraints[constraintKey]) { // If the blocking constraint is true
+                    if (gameState.constraints[constraintKey]) { 
                         const blockCondition = project.blocked_by_if[constraintKey];
-                        if (blockCondition.probability_decrease_factor) { // This is more for events, but can be adapted
-                             if (Math.random() < blockCondition.probability_decrease_factor) return false; // Project becomes unavailable sometimes
-                        } else {
-                            return false; // Hard block
+                        if (blockCondition.probability_decrease_factor) { 
+                             if (Math.random() < blockCondition.probability_decrease_factor && project.id !== "fritid_resa_utomlands") { // Specific hack for travel, better to make this generic
+                                 // console.log(`Project ${project.name} blocked by ${constraintKey} due to probability.`);
+                                 return false; 
+                             }
+                        } else if (typeof blockCondition === 'boolean' && blockCondition) { // simple boolean block
+                            // console.log(`Project ${project.name} hard blocked by ${constraintKey}.`);
+                            return false; 
                         }
+                         // Cost increase factors are handled in getAdjustedProjectCost
                     }
                 }
             }
-
             return true;
         }
         
         function getAdjustedProjectCost(project, costType) {
             let baseCost = project.costs[costType] || 0;
-            if (project.reduced_by_if) {
-                for (const constraintKey in project.reduced_by_if) {
-                    if (gameState.constraints[constraintKey]) { // If the reducing constraint is true
-                        const reduction = project.reduced_by_if[constraintKey];
-                        if (reduction.time_cost_increase_factor && costType === 'time') {
-                             baseCost *= reduction.time_cost_increase_factor;
+            let costKeySuffix = costType === 'time' ? 'effort_time_cost_increase_factor' : `${costType}_cost_increase_factor`;
+
+            if (project.blocked_by_if) { // Check "blocked_by_if" for cost increases (often used for leisure when having children)
+                 for (const constraintKey in project.blocked_by_if) {
+                    if (gameState.constraints[constraintKey]) {
+                        const condition = project.blocked_by_if[constraintKey];
+                        if (condition[costKeySuffix]) {
+                             baseCost *= condition[costKeySuffix];
                         }
-                         // Can add more reduction types here
+                    }
+                }
+            }
+            if (project.reduced_by_if) { // Check "reduced_by_if" for cost increases
+                 for (const constraintKey in project.reduced_by_if) {
+                    if (gameState.constraints[constraintKey]) {
+                        const condition = project.reduced_by_if[constraintKey];
+                         if (condition[costKeySuffix]) {
+                             baseCost *= condition[costKeySuffix];
+                        }
                     }
                 }
             }
@@ -913,7 +1087,8 @@
         function renderProjects() {
             const menuDiv = document.getElementById('projectMenu');
             menuDiv.innerHTML = '';
-            const totalTimeSpentOnProjects = gameState.currentDecadeProjects.reduce((sum, p) => sum + getAdjustedProjectCost(p, 'time'), 0);
+            const totalEffortTimeSpent = gameState.currentDecadeProjectDurations.reduce((sum, p) => sum + getAdjustedProjectCost(p.project, 'time'), 0);
+            const totalYearsFilled = gameState.currentDecadeProjectDurations.reduce((sum, p) => sum + p.project.duration, 0);
 
             for (const categoryName in projectCategories) {
                 const category = projectCategories[categoryName];
@@ -925,30 +1100,32 @@
                     const itemDiv = document.createElement('div');
                     itemDiv.className = 'project-item';
                     
-                    const actualTimeCost = getAdjustedProjectCost(project, 'time');
+                    const actualEffortTimeCost = getAdjustedProjectCost(project, 'time');
                     const actualEconomicCost = getAdjustedProjectCost(project, 'economic');
 
                     let titleText = `${project.name}`;
                     if (project.duration > 0) titleText += ` (${project.duration} år)`;
                     
-                    let costText = `Tid: ${actualTimeCost}`;
-                    if (actualEconomicCost > 0) costText += `, Eko: ${actualEconomicCost}`;
-                    else if (project.costs.economic < 0) costText += `, Eko: +${Math.abs(actualEconomicCost)}`; // Income shown as +
-
+                    let costText = `Anstr.: ${actualEffortTimeCost}`;
+                    if (actualEconomicCost !== 0) costText += `, Eko: ${actualEconomicCost}`;
+                    
                     itemDiv.innerHTML = `${titleText}<small>${project.description}<br><strong>Kostnad:</strong> ${costText}</small>`;
                     
-                    const canAffordTime = (totalTimeSpentOnProjects + actualTimeCost) <= INITIAL_TIME_PER_DECADE;
+                    const canAffordEffortTime = (totalEffortTimeSpent + actualEffortTimeCost) <= INITIAL_EFFORT_TIME_PER_DECADE;
+                    const canAffordYears = (totalYearsFilled + project.duration) <= YEARS_PER_DECADE;
                     const canAffordEconomic = gameState.capital.economic >= (actualEconomicCost > 0 ? actualEconomicCost : 0) ;
                     
-                    if (meetsRequirements(project) && canAffordTime && canAffordEconomic) {
+                    if (meetsRequirements(project) && canAffordEffortTime && canAffordYears && canAffordEconomic) {
                         itemDiv.onclick = () => selectProject(project);
                     } else {
                         itemDiv.classList.add('disabled');
-                        let reason = "";
-                        if (!meetsRequirements(project)) reason += "Krav ej uppfyllda. ";
-                        if (!canAffordTime) reason += "Inte tillräckligt med tid kvar. ";
-                        if (!canAffordEconomic) reason += "Inte tillräckligt med ekonomiskt kapital. ";
-                        itemDiv.title = reason.trim();
+                        let reason = [];
+                        if (project.unique && gameState.completedUniqueProjectIds.has(project.id)) reason.push("Redan slutfört.");
+                        else if (!meetsRequirements(project)) reason.push("Krav ej uppfyllda.");
+                        if (!canAffordYears && project.duration > 0) reason.push("Inte tillräckligt med år kvar i decenniet.");
+                        if (!canAffordEffortTime) reason.push("Inte tillräckligt med ansträngningstid.");
+                        if (!canAffordEconomic) reason.push("Inte tillräckligt med ekonomiskt kapital.");
+                        itemDiv.title = reason.join(" ").trim() || "Kan inte väljas just nu.";
                     }
                     categoryDiv.appendChild(itemDiv);
                 });
@@ -957,12 +1134,17 @@
         }
         
         function selectProject(project) {
-            const actualTimeCost = getAdjustedProjectCost(project, 'time');
+            const actualEffortTimeCost = getAdjustedProjectCost(project, 'time');
             const actualEconomicCost = getAdjustedProjectCost(project, 'economic');
-            const totalTimeSpentOnProjects = gameState.currentDecadeProjects.reduce((sum, p) => sum + getAdjustedProjectCost(p, 'time'), 0);
+            const totalEffortTimeSpent = gameState.currentDecadeProjectDurations.reduce((sum, p) => sum + getAdjustedProjectCost(p.project, 'time'), 0);
+            const totalYearsFilled = gameState.currentDecadeProjectDurations.reduce((sum, p) => sum + p.project.duration, 0);
 
-            if ((totalTimeSpentOnProjects + actualTimeCost) > INITIAL_TIME_PER_DECADE) {
-                showModal('randomEventModal', 'För lite tid', 'Du har inte tillräckligt med tid kvar detta decennium för detta projekt.');
+            if ((totalYearsFilled + project.duration) > YEARS_PER_DECADE && project.duration > 0) {
+                showModal('randomEventModal', 'För få år kvar', 'Detta projekt får inte plats inom decenniets 10 år med nuvarande planering.');
+                return;
+            }
+            if ((totalEffortTimeSpent + actualEffortTimeCost) > INITIAL_EFFORT_TIME_PER_DECADE) {
+                showModal('randomEventModal', 'För lite ansträngningstid', 'Du har inte tillräckligt med ansträngningstid kvar för detta projekt.');
                 return;
             }
             if (gameState.capital.economic < (actualEconomicCost > 0 ? actualEconomicCost : 0)) {
@@ -970,146 +1152,180 @@
                 return;
             }
 
-            // Deduct economic cost immediately upon selection
-            if (actualEconomicCost > 0) {
+            if (actualEconomicCost !== 0) { // Handles both positive cost and negative (income)
                 gameState.capital.economic -= actualEconomicCost;
-            } else if (actualEconomicCost < 0) { // If it's an income project selected now (e.g. selling something)
-                 gameState.capital.economic += Math.abs(actualEconomicCost);
             }
 
-            // For simplicity, we store the project reference. Costs/benefits applied at decade end.
-            // Actual time is "spent" by adding to list.
-            gameState.currentDecadeProjects.push(project);
+            gameState.currentDecadeProjectDurations.push({ project: project, duration: project.duration });
             
             updateCharacterDisplay();
-            renderProjects(); // Re-render to update availability based on new capital/time
-            updateCurrentProjectsDisplay();
+            renderProjects(); 
+            renderTimelineSlots();
+            updateCurrentProjectsListDisplay();
         }
 
-        function updateCurrentProjectsDisplay() {
+        function updateCurrentProjectsListDisplay() { // Renamed for clarity
             const display = document.getElementById('currentProjectsDisplay');
-            const timeSpentOnProjects = gameState.currentDecadeProjects.reduce((sum, p) => sum + getAdjustedProjectCost(p, 'time'), 0);
-            document.getElementById('timeSpent').innerText = timeSpentOnProjects;
-
-            if (gameState.currentDecadeProjects.length === 0) {
-                display.innerHTML = '<p><em>Inga projekt valda än.</em></p>';
+            if (gameState.currentDecadeProjectDurations.length === 0) {
+                display.innerHTML = '<p><em>Inga projekt valda än. Klicka på ett projekt ovan för att lägga till det.</em></p>';
                 return;
             }
-            display.innerHTML = '';
-            gameState.currentDecadeProjects.forEach(p => {
-                const category = Object.values(projectCategories).find(cat => cat.projects.includes(p));
+            display.innerHTML = '<h4>Valda projekt detta decennium:</h4>';
+            gameState.currentDecadeProjectDurations.forEach(item => {
+                const p = item.project;
                 const pDiv = document.createElement('div');
                 pDiv.classList.add('project-entry');
-                pDiv.style.backgroundColor = category ? category.color : '#ccc';
-                pDiv.textContent = `${p.name} (Tid: ${getAdjustedProjectCost(p, 'time')}${p.costs.economic ? ', Eko: ' + getAdjustedProjectCost(p, 'economic') : ''})`;
+                pDiv.style.backgroundColor = projectCategories[p.category]?.color || '#ccc';
+                let text = `${p.name}`;
+                if (p.duration > 0) text += ` (${p.duration} år)`;
+                text += ` (Anstr: ${getAdjustedProjectCost(p, 'time')}${p.costs.economic ? ', Eko: ' + getAdjustedProjectCost(p, 'economic') : ''})`;
+                pDiv.textContent = text;
                 display.appendChild(pDiv);
             });
         }
         
         function clearCurrentDecadeProjects() {
-            // Refund any upfront economic costs
-            gameState.currentDecadeProjects.forEach(project => {
-                const actualEconomicCost = getAdjustedProjectCost(project, 'economic');
-                 if (actualEconomicCost > 0) {
-                    gameState.capital.economic += actualEconomicCost;
-                } else if (actualEconomicCost < 0) {
-                    gameState.capital.economic -= Math.abs(actualEconomicCost);
+            gameState.currentDecadeProjectDurations.forEach(item => {
+                const actualEconomicCost = getAdjustedProjectCost(item.project, 'economic');
+                 if (actualEconomicCost !== 0) {
+                    gameState.capital.economic += actualEconomicCost; // Refund/reverse income
                 }
             });
 
-            gameState.currentDecadeProjects = [];
+            gameState.currentDecadeProjectDurations = [];
             updateCharacterDisplay();
             renderProjects();
-            updateCurrentProjectsDisplay();
+            renderTimelineSlots();
+            updateCurrentProjectsListDisplay();
         }
+        
+        function applyProjectEffects(project, currentDecadeLogEntry) {
+            let effectSummary = [];
+            let lifeGoal = gameState.character.lifeGoal;
+            let goalBonusMultiplier = 1 + (lifeGoalsData[lifeGoal]?.bonus_multiplier || 0); // e.g. 1.1 if 10% bonus
+
+            if (project.benefits) {
+                // Capital benefits
+                if (project.benefits.capital) {
+                    for (const type in project.benefits.capital) {
+                        let benefitValue = project.benefits.capital[type];
+                        if (lifeGoalsData[lifeGoal]?.bonus?.capital?.[type]) { // Check if goal gives bonus to this capital type
+                            benefitValue *= (1 + lifeGoalsData[lifeGoal].bonus.capital[type]);
+                        }
+                        gameState.capital[type] = (gameState.capital[type] || 0) + benefitValue;
+                        effectSummary.push(`${type}: ${benefitValue >= 0 ? '+' : ''}${Math.round(benefitValue)}`);
+                    }
+                }
+                // Stats benefits
+                if (project.benefits.stats) {
+                    for (const type in project.benefits.stats) {
+                        let benefitValue = project.benefits.stats[type];
+                         if (lifeGoalsData[lifeGoal]?.bonus?.stats?.[type]) { // Check if goal gives bonus to this stat
+                            benefitValue *= (1 + lifeGoalsData[lifeGoal].bonus.stats[type]);
+                        }
+                        gameState.stats[type] = (gameState.stats[type] || 0) + benefitValue;
+                        effectSummary.push(`${type}: ${benefitValue >= 0 ? '+' : ''}${Math.round(benefitValue)}`);
+                    }
+                }
+            }
+            // Costs (effort time already "spent", economic cost at selection, other direct capital costs)
+            if (project.costs) {
+                for (const type in project.costs) {
+                    if (type !== 'time' && type !== 'economic') { // time & economic handled elsewhere or conceptual
+                        if (gameState.capital.hasOwnProperty(type)) {
+                            gameState.capital[type] += project.costs[type]; // Can be negative
+                            if(project.costs[type] !== 0) effectSummary.push(`${type}: ${project.costs[type]}`);
+                        } else if (gameState.stats.hasOwnProperty(type)) {
+                            gameState.stats[type] += project.costs[type];
+                            if(project.costs[type] !== 0) effectSummary.push(`${type}: ${project.costs[type]}`);
+                        }
+                    }
+                }
+            }
+
+            if (project.outcomes) {
+                if (project.outcomes.constraints) {
+                    for (const key in project.outcomes.constraints) {
+                        gameState.constraints[key] = project.outcomes.constraints[key];
+                        effectSummary.push(`Status: ${key} -> ${project.outcomes.constraints[key]}`);
+                    }
+                }
+                if (project.outcomes.education_level) {
+                    // Ensure education only progresses, doesn't regress
+                    const eduHierarchy = ['ingen', 'grundskola', 'grundskola_avslutad', 'folkhögskola', 'gymnasium', 'yrkeshögskola', 'högskola_kandidat', 'högskola_master'];
+                    if(eduHierarchy.indexOf(project.outcomes.education_level) > eduHierarchy.indexOf(gameState.constraints.education_level)){
+                        gameState.constraints.education_level = project.outcomes.education_level;
+                        effectSummary.push(`Utbildning: ${project.outcomes.education_level.replace("_", " ")}`);
+                    }
+                }
+            }
+            if(project.unique) {
+                gameState.completedUniqueProjectIds.add(project.id);
+            }
+            gameState.allCompletedProjects.push({ name: project.name, decade: gameState.currentDecadeIndex });
+            currentDecadeLogEntry.projects.push({ name: project.name, effects: effectSummary.join(', ') || "Inga direkta effekter." });
+            return effectSummary.join(', ');
+        }
+
 
         function completeDecade() {
             let reflectionHTML = `<h3>Sammanfattning för ${gameState.decades[gameState.currentDecadeIndex]} (Ålder ${gameState.age}-${gameState.age+9}):</h3>`;
             reflectionHTML += "<h4>Genomförda projekt:</h4><ul>";
+            
+            const currentDecadeLogEntry = gameState.decadeLog[gameState.currentDecadeIndex];
 
-            if (gameState.currentDecadeProjects.length === 0) {
-                reflectionHTML += "<li>Inga större projekt genomfördes detta decennium.</li>";
+            if (gameState.currentDecadeProjectDurations.length === 0) {
+                reflectionHTML += "<li>Inga större projekt planerades detta decennium.</li>";
             }
 
-            gameState.currentDecadeProjects.forEach(project => {
+            gameState.currentDecadeProjectDurations.forEach(item => {
+                const project = item.project;
                 reflectionHTML += `<li><strong>${project.name}</strong>: `;
-                let effectSummary = [];
-
-                // Apply benefits (capital & stats)
-                if (project.benefits) {
-                    for (const type in project.benefits) { // economic, cultural, social, symbolic, career, happiness, health
-                        if (gameState.capital.hasOwnProperty(type)) {
-                            gameState.capital[type] += project.benefits[type];
-                            effectSummary.push(`${type}: +${project.benefits[type]}`);
-                        } else if (gameState.stats.hasOwnProperty(type)) {
-                            gameState.stats[type] += project.benefits[type];
-                            effectSummary.push(`${type}: +${project.benefits[type]}`);
-                        } else if (type === 'career') { // Special handling for career points
-                            gameState.capital.symbolic += project.benefits[type] * 0.5; // Career can give symbolic capital
-                             gameState.capital.economic += project.benefits[type] * 2; // And some economic boost proxy
-                            effectSummary.push(`karriärpoäng: +${project.benefits[type]}`);
-                        }
-                    }
-                }
-                // Apply costs (time was conceptually spent, economic was upfront)
-                // Other non-time/economic costs if any (e.g. project.costs.cultural = -5 means it cost cultural capital)
-                if(project.costs){
-                    for(const type in project.costs){
-                        if(type !== 'time' && type !== 'economic' && gameState.capital.hasOwnProperty(type)){
-                            gameState.capital[type] += project.costs[type]; // Will be negative if it's a cost
-                            effectSummary.push(`${type}: ${project.costs[type]}`);
-                        }
-                         else if (type !== 'time' && type !== 'economic' && gameState.stats.hasOwnProperty(type)){
-                            gameState.stats[type] += project.costs[type];
-                             effectSummary.push(`${type}: ${project.costs[type]}`);
-                        }
-                    }
-                }
-
-
-                // Update constraints based on project outcomes
-                if (project.outcomes) {
-                    for (const key in project.outcomes) {
-                        gameState.constraints[key] = project.outcomes[key];
-                        effectSummary.push(`Ny status: ${key} -> ${project.outcomes[key]}`);
-                    }
-                }
-                reflectionHTML += effectSummary.join(', ') + "</li>";
-                gameState.allCompletedProjects.push(project.name); // Add to overall list
-                gameState.decadeLog[gameState.currentDecadeIndex].projects.push({name: project.name, effects: effectSummary.join(', ')});
+                const effectsString = applyProjectEffects(project, currentDecadeLogEntry);
+                reflectionHTML += effectsString + "</li>";
             });
             reflectionHTML += "</ul>";
 
-            // Apply historical modifiers for the decade (if any)
-            const histModifiers = historicalEventsData[gameState.currentDecadeIndex].modifiers;
-            if (histModifiers) {
+            const histData = historicalEventsData[gameState.currentDecadeIndex];
+            if (histData && histData.modifiers) {
                 reflectionHTML += "<h4>Påverkan från samhällsutvecklingen:</h4><ul>";
-                if (histModifiers.economic_growth) {
-                    let growth = Math.round(gameState.capital.economic * histModifiers.economic_growth);
-                    gameState.capital.economic += growth;
-                    reflectionHTML += `<li>Ekonomisk tillväxt/nedgång: ${growth > 0 ? '+' : ''}${growth} ekonomiskt kapital.</li>`;
+                const modifiers = histData.modifiers;
+                if (modifiers.capital_growth) {
+                    for(const capType in modifiers.capital_growth) {
+                        let growth = Math.round((gameState.capital[capType]||0) * modifiers.capital_growth[capType]);
+                        gameState.capital[capType] += growth;
+                        reflectionHTML += `<li>Tillväxt ${capType}: ${growth >= 0 ? '+' : ''}${growth}.</li>`;
+                    }
                 }
-                if (histModifiers.social_change) {
-                    let change = Math.round(gameState.capital.social * histModifiers.social_change);
-                    gameState.capital.social += change;
-                     reflectionHTML += `<li>Social förändring: ${change > 0 ? '+' : ''}${change} socialt kapital.</li>`;
+                if (modifiers.capital_change) {
+                     for(const capType in modifiers.capital_change) {
+                        let change = Math.round((gameState.capital[capType]||0) * modifiers.capital_change[capType]);
+                        // Special handling for functions as modifiers (e.g. social capital change in 2010s)
+                        if(typeof modifiers.capital_change[capType] === 'function'){
+                            change = Math.round(modifiers.capital_change[capType](gameState)); // Pass gameState if function needs it
+                        } else {
+                             change = Math.round((gameState.capital[capType]||0) * modifiers.capital_change[capType]);
+                        }
+                        gameState.capital[capType] += change;
+                        reflectionHTML += `<li>Förändring ${capType}: ${change >= 0 ? '+' : ''}${change}.</li>`;
+                    }
                 }
-                 if (histModifiers.cultural_change) {
-                    let change = Math.round(gameState.capital.cultural * histModifiers.cultural_change);
-                    gameState.capital.cultural += change;
-                     reflectionHTML += `<li>Kulturell förändring: ${change > 0 ? '+' : ''}${change} kulturellt kapital.</li>`;
+                if (modifiers.general_optimism) {
+                    let boost = Math.round(gameState.stats.happiness * modifiers.general_optimism);
+                    gameState.stats.happiness += boost;
+                     reflectionHTML += `<li>Allmän optimism: +${boost} lycka.</li>`;
                 }
-                // Add more historical modifiers as needed
+                // Add more specific historical modifiers here
                 reflectionHTML += "</ul>";
             }
 
 
             document.getElementById('reflectionContent').innerHTML = reflectionHTML;
             
-            const decadeEventsLog = gameState.decadeLog[gameState.currentDecadeIndex].events;
+            const decadeEventsLog = currentDecadeLogEntry.events;
             const eventsListElement = document.querySelector("#decadeEvents ul");
-            eventsListElement.innerHTML = ''; // Clear previous
-            if(decadeEventsLog.length > 0){
+            eventsListElement.innerHTML = ''; 
+            if(decadeEventsLog && decadeEventsLog.length > 0){
                 decadeEventsLog.forEach(event => {
                     const li = document.createElement('li');
                     li.innerHTML = `<strong>${event.title}:</strong> ${event.description} <em>(${event.effects})</em>`;
@@ -1120,8 +1336,6 @@
                  document.getElementById("decadeEvents").style.display = 'none';
             }
 
-
-            // Clamp stats
             gameState.stats.health = Math.max(0, Math.min(100, gameState.stats.health));
             gameState.stats.happiness = Math.max(0, Math.min(100, gameState.stats.happiness));
 
@@ -1137,35 +1351,32 @@
         // --- RANDOM EVENTS ---
         function triggerRandomEvents() {
             const eventCategories = ['positive', 'negative', 'neutral'];
-            let eventTriggeredThisDecade = false;
+            let eventTriggeredThisDecade = false; // Could be used to limit # of events
 
             for (const category of eventCategories) {
                 for (const event of randomEventTypes[category]) {
                     let probability = event.probability;
 
-                    // Adjust probability based on social class
-                    if (event.class_modifier && gameState.character.classDetails.name in event.class_modifier) {
-                        probability *= event.class_modifier[gameState.character.classDetails.name];
+                    if (event.class_modifier && gameState.character.socialClass in event.class_modifier) {
+                        probability *= event.class_modifier[gameState.character.socialClass];
                     }
-                    // Adjust probability based on gender (if implemented in event data)
-                    // e.g. if (event.gender_modifier && gameState.character.gender in event.gender_modifier)
-
-                    // Adjust probability based on current decade (if applicable)
                     if (event.decade_modifier && gameState.currentDecadeIndex in event.decade_modifier) {
                         probability *= event.decade_modifier[gameState.currentDecadeIndex];
                     }
-                    
-                    // Multiply by character's general opportunity modifier
                     probability *= gameState.character.opportunitiesModifier;
+                    
+                    // Life goal can influence event probability
+                    if(gameState.character.lifeGoal && event.life_goal_modifier?.[gameState.character.lifeGoal]){
+                        probability *= event.life_goal_modifier[gameState.character.lifeGoal];
+                    }
 
 
                     if (Math.random() < probability) {
                         let canTrigger = true;
-                        // Check requirements for the event
                         if (event.requirements) {
                             if (event.requirements.capital_min) {
                                 for (const cap_type in event.requirements.capital_min) {
-                                    if (gameState.capital[cap_type] < event.requirements.capital_min[cap_type]) canTrigger = false;
+                                    if ((gameState.capital[cap_type]||0) < event.requirements.capital_min[cap_type]) canTrigger = false;
                                 }
                             }
                             if (event.requirements.constraints_is) {
@@ -1173,7 +1384,7 @@
                                     if (gameState.constraints[key] !== event.requirements.constraints_is[key]) canTrigger = false;
                                 }
                             }
-                             if (event.requirements.constraints_any) { // e.g. must have one of several education levels
+                             if (event.requirements.constraints_any) { 
                                 let metAnyConstraint = false;
                                 for (const key in event.requirements.constraints_any) {
                                     const requiredValues = Array.isArray(event.requirements.constraints_any[key]) ? event.requirements.constraints_any[key] : [event.requirements.constraints_any[key]];
@@ -1187,114 +1398,130 @@
                         }
 
                         if (canTrigger) {
-                            applyEventEffect(event);
+                            applyRandomEventEffect(event); // Renamed function
                             showModal('randomEventModal', `Slumpmässig händelse: ${event.title}`, event.description);
-                            eventTriggeredThisDecade = true; // For simplicity, allow multiple events, but this flag could limit to one major.
-                            // break; // Optional: only one event per category per decade? Or one total?
+                            eventTriggeredThisDecade = true; 
                         }
                     }
                 }
-                // if (eventTriggeredThisDecade && category !== 'neutral') break; // Optional: only one major (pos/neg) event per decade
             }
         }
 
-        function applyEventEffect(event) {
+        function applyRandomEventEffect(event) { // Renamed
             let effectSummary = [];
+            let lifeGoal = gameState.character.lifeGoal;
+
             if (event.effects.capital) {
                 for (const type in event.effects.capital) {
-                    gameState.capital[type] = (gameState.capital[type] || 0) + event.effects.capital[type];
-                     effectSummary.push(`${type}: ${event.effects.capital[type] > 0 ? '+' : ''}${event.effects.capital[type]}`);
+                    let value = event.effects.capital[type];
+                    if(lifeGoalsData[lifeGoal]?.bonus?.capital?.[type] && value > 0){ // Bonus only on positive gains
+                        value *= (1 + lifeGoalsData[lifeGoal].bonus.capital[type]);
+                    }
+                    gameState.capital[type] = (gameState.capital[type] || 0) + value;
+                    effectSummary.push(`${type}: ${value >= 0 ? '+' : ''}${Math.round(value)}`);
                 }
             }
             if (event.effects.stats) {
                 for (const type in event.effects.stats) {
-                    gameState.stats[type] = (gameState.stats[type] || 0) + event.effects.stats[type];
-                    effectSummary.push(`${type}: ${event.effects.stats[type] > 0 ? '+' : ''}${event.effects.stats[type]}`);
+                     let value = event.effects.stats[type];
+                    if(lifeGoalsData[lifeGoal]?.bonus?.stats?.[type] && value > 0){
+                        value *= (1 + lifeGoalsData[lifeGoal].bonus.stats[type]);
+                    }
+                    gameState.stats[type] = (gameState.stats[type] || 0) + value;
+                    effectSummary.push(`${type}: ${value >= 0 ? '+' : ''}${Math.round(value)}`);
                 }
             }
-            if (event.effects.constraints) { // If event changes a constraint
-                for (const type in event.effects.constraints) {
-                    gameState.constraints[type] = event.effects.constraints[type];
-                     effectSummary.push(`Ny status: ${type} -> ${event.effects.constraints[type]}`);
+            if (event.effects.outcomes && event.effects.outcomes.constraints) { 
+                for (const type in event.effects.outcomes.constraints) {
+                    gameState.constraints[type] = event.effects.outcomes.constraints[type];
+                    effectSummary.push(`Ny status: ${type} -> ${event.effects.outcomes.constraints[type]}`);
                 }
             }
-            // Log event
+            
             if(!gameState.decadeLog[gameState.currentDecadeIndex]) gameState.decadeLog[gameState.currentDecadeIndex] = {projects: [], events: []};
             gameState.decadeLog[gameState.currentDecadeIndex].events.push({
                 title: event.title,
                 description: event.description,
                 effects: effectSummary.join(', ') || "Inga direkta effekter."
             });
-            updateCharacterDisplay(); // Update display after event
+            updateCharacterDisplay(); 
         }
 
         // --- FINAL SUMMARY ---
         function showFinalSummary() {
             const summaryDiv = document.getElementById('lifeSummary');
-            summaryDiv.innerHTML = ''; // Clear previous summary
+            summaryDiv.innerHTML = ''; 
 
             let finalCapitalHTML = `<h4>Slutligt Kapital:</h4><div class="character-stats">`;
             for (const [key, value] of Object.entries(gameState.capital)) {
-                finalCapitalHTML += `<div class="stat-item"><strong>${key.charAt(0).toUpperCase() + key.slice(1)}:</strong> ${value}</div>`;
+                finalCapitalHTML += `<div class="stat-item"><strong>${key.charAt(0).toUpperCase() + key.slice(1)}:</strong> ${Math.round(value)}</div>`;
             }
             finalCapitalHTML += `</div>`;
             
             let finalStatsHTML = `<h4>Slutlig Livskvalitet:</h4><div class="character-stats">`;
              for (const [key, value] of Object.entries(gameState.stats)) {
-                finalStatsHTML += `<div class="stat-item"><strong>${key.charAt(0).toUpperCase() + key.slice(1)}:</strong> ${value}</div>`;
+                finalStatsHTML += `<div class="stat-item"><strong>${key.charAt(0).toUpperCase() + key.slice(1)}:</strong> ${Math.round(value)}</div>`;
             }
             finalStatsHTML += `</div>`;
-
             document.getElementById('finalStats').innerHTML = `${finalCapitalHTML}${finalStatsHTML}`;
 
-            // Summary of completed projects
             const projectsCard = document.createElement('div');
             projectsCard.className = 'summary-card';
-            projectsCard.innerHTML = '<h4>Genomförda Livsprojekt:</h4><ul>' + 
-                (gameState.allCompletedProjects.length > 0 ? gameState.allCompletedProjects.map(p => `<li>${p}</li>`).join('') : '<li>Inga större projekt registrerade.</li>') + 
-                '</ul>';
+            let projectsHTML = '<h4>Genomförda Livsprojekt:</h4><ul>';
+            const projectsByDecade = {};
+            gameState.allCompletedProjects.forEach(p => {
+                if(!projectsByDecade[p.decade]) projectsByDecade[p.decade] = [];
+                projectsByDecade[p.decade].push(p.name);
+            });
+            for(let i = 0; i < gameState.decades.length; i++){
+                if(projectsByDecade[i] && projectsByDecade[i].length > 0){
+                    projectsHTML += `<li><strong>${gameState.decades[i]}:</strong><ul>`;
+                    projectsByDecade[i].forEach(name => projectsHTML += `<li>${name}</li>`);
+                    projectsHTML += `</ul></li>`;
+                }
+            }
+            if (gameState.allCompletedProjects.length === 0) projectsHTML += '<li>Inga större projekt registrerade.</li>';
+            projectsHTML += '</ul>';
+            projectsCard.innerHTML = projectsHTML;
             summaryDiv.appendChild(projectsCard);
 
-            // Summary of significant events per decade
             const eventsCard = document.createElement('div');
             eventsCard.className = 'summary-card';
-            eventsCard.innerHTML = '<h4>Noterbara Händelser Genom Åren:</h4>';
-            const eventsList = document.createElement('ul');
+            let eventsHTML = '<h4>Noterbara Händelser Genom Åren:</h4><ul>';
+            let hadEvents = false;
             gameState.decadeLog.forEach((log, index) => {
                 if (log.events.length > 0) {
-                    const decadeTitle = document.createElement('li');
-                    decadeTitle.innerHTML = `<strong>${gameState.decades[index]}:</strong>`;
-                    const subList = document.createElement('ul');
+                    hadEvents = true;
+                    eventsHTML += `<li><strong>${gameState.decades[index]}:</strong><ul>`;
                     log.events.forEach(event => {
-                        const eventItem = document.createElement('li');
-                        eventItem.innerHTML = `${event.title} - <em>${event.effects}</em>`;
-                        subList.appendChild(eventItem);
+                        eventsHTML += `<li>${event.title} <em>(${event.effects})</em></li>`;
                     });
-                    decadeTitle.appendChild(subList);
-                    eventsList.appendChild(decadeTitle);
+                    eventsHTML += `</ul></li>`;
                 }
             });
-            if (eventsList.childNodes.length === 0) {
-                eventsList.innerHTML = '<li>Inga speciella händelser registrerade.</li>';
-            }
-            eventsCard.appendChild(eventsList);
+            if (!hadEvents) eventsHTML += '<li>Inga speciella slumpmässiga händelser registrerade.</li>';
+            eventsHTML += '</ul>';
+            eventsCard.innerHTML = eventsHTML;
             summaryDiv.appendChild(eventsCard);
             
-            // Overall reflection based on final capital/stats (simple version)
-            const reflectionCard = document.createElement('div');
-            reflectionCard.className = 'summary-card';
-            let reflectionText = "<h4>Summering av ditt liv:</h4><p>";
-            if (gameState.stats.happiness > 70 && gameState.capital.economic > 300) {
-                reflectionText += "Du verkar ha levt ett framgångsrikt och lyckligt liv, med god ekonomi och många upplevelser.";
-            } else if (gameState.stats.happiness > 50 || gameState.capital.social > 50) {
-                reflectionText += "Ditt liv hade sina upp- och nedgångar, men du byggde starka relationer och fann stunder av glädje.";
-            } else {
-                reflectionText += "Livet var kanske inte alltid lätt, men varje erfarenhet har format dig.";
+            // Life Goal Reflection
+            const lifeGoalCard = document.getElementById('lifeGoalReflection');
+            const chosenGoalKey = gameState.character.lifeGoal;
+            const chosenGoalInfo = lifeGoalsData[chosenGoalKey];
+            let goalReflectionText = `<h4>Reflektion över ditt livsmål: "${chosenGoalInfo.name}"</h4>`;
+            let score = 0; // Simple scoring for goal
+            let explanation = "";
+
+            switch(chosenGoalKey) {
+                case 'happiness': score = gameState.stats.happiness; explanation = `Din slutliga lycka blev ${Math.round(score)}/100.`; break;
+                case 'wealth': score = gameState.capital.economic; explanation = `Ditt slutliga ekonomiska kapital blev ${Math.round(score)}.`; break;
+                case 'family': score = gameState.capital.social + (gameState.constraints.hasChildren ? 20 : 0) + (gameState.constraints.isMarried ? 10 : 0); explanation = `Du byggde relationer och familjeband (Socialt kapital: ${Math.round(gameState.capital.social)}, Barn: ${gameState.constraints.hasChildren ? 'Ja':'Nej'}, Gift/Sambo: ${gameState.constraints.isMarried ? 'Ja':'Nej'}).`; break;
+                case 'knowledge': score = gameState.capital.cultural; explanation = `Ditt slutliga kulturella kapital blev ${Math.round(score)}. Din högsta utbildning var ${gameState.constraints.education_level.replace("_", " ")}.`; break;
+                case 'status': score = gameState.capital.symbolic; explanation = `Ditt slutliga symboliska kapital (anseende) blev ${Math.round(score)}.`; break;
             }
-            reflectionText += ` Du nådde en ålder av ${gameState.age + 9} år.`;
-            reflectionText += "</p>";
-            reflectionCard.innerHTML = reflectionText;
-            summaryDiv.appendChild(reflectionCard);
+            goalReflectionText += `<p>${explanation}</p><p>Detta speglar hur väl dina val överensstämde med din strävan att ${chosenGoalInfo.description.toLowerCase().substring(0, chosenGoalInfo.description.length-1)}.</p>`;
+            lifeGoalCard.innerHTML = goalReflectionText;
+            lifeGoalCard.style.display = 'block';
 
 
             showScreen('summaryScreen');
