@@ -5,21 +5,19 @@ let canvasWidth = 800;
 let canvasHeight = 600;
 
 let player;
-let history = []; // Lagrar spelarens stats varje år för grafen
+let history = [];
 
 let currentEvent = null;
 let choiceButtons = [];
 let nextYearButton;
-let reflectionText;
 
 function setup() {
     createCanvas(canvasWidth, canvasHeight);
-    textFont('Verdana');
+    textFont('Arial');
     resetGame();
 }
 
 function resetGame() {
-    // Slumpmässiga startförutsättningar
     const sesChoices = ['arbetarklass', 'medelklass', 'överklass'];
     const locationChoices = ['småstad', 'medelstor stad', 'storstad'];
     const genderChoices = ['man', 'kvinna'];
@@ -33,17 +31,17 @@ function resetGame() {
         ses: ses,
         location: location,
         age: 0,
-        year: 0, // Sätts nedan
+        year: 0,
         health: int(random(70, 95)),
-        economy: 0, // Startkapital baserat på klass
-        education: 0, // Grundpotential baserat på klass
-        socialCapital: 0, // Nätverk etc. baserat på klass
+        economy: 0,
+        education: 0,
+        socialCapital: 0,
         mentalHealth: int(random(65, 90)),
-        log: [], // Logg för val
-        timeline: [] // Lagrar {år, händelse}
+        log: [],
+        timeline: []
     };
     
-    // Sätt startvärden baserat på socioekonomisk status (SES)
+    // Sätt startvärden baserat på socioekonomisk status
     switch(ses) {
         case 'arbetarklass':
             player.economy = int(random(10, 25));
@@ -64,11 +62,10 @@ function resetGame() {
     
     player.year = player.birthYear;
     
-    history = []; // Nollställ historiken
+    history = [];
     currentEvent = null;
     choiceButtons = [];
 
-    // Skapa en knapp för att gå vidare mellan åren
     nextYearButton = new Button("Nästa År", width - 130, height - 50, 110, 30, advanceTime);
     nextYearButton.hidden = true;
     
@@ -94,35 +91,32 @@ function draw() {
     }
 }
 
-// ---- RIT-FUNKTIONER FÖR OLIKA TILLSTÅND ----
-
 function drawStartScreen() {
     textAlign(CENTER, CENTER);
     fill(0);
     textSize(26);
-    text('Livsbanan: En Simulering', width / 2, 50);
+    text('Livsbanan: En Simulering', width / 2, 80);
 
     textSize(16);
     fill(50);
-    let startText = `Du föddes ${player.year} som ${player.gender} i en ${player.ses}-familj i en ${player.location}.\n\nDina startförutsättningar kommer att forma dina möjligheter i livet. Vissa dörrar kommer att vara öppna, andra stängda. Vissa val kommer att vara enkla, andra kräver kamp.\n\nKlicka för att börja din resa.`;
-    text(startText, width / 2, height / 2 - 100, width - 100, 300);
+    let startText = `Du föddes ${player.birthYear} som ${player.gender} i en ${player.ses}-familj i en ${player.location}.\n\nDina startförutsättningar kommer att forma dina möjligheter i livet. Vissa dörrar kommer att vara öppna, andra stängda.\n\nKlicka för att börja din resa.`;
+    text(startText, width / 2, height / 2, width - 100, 300);
 }
 
 function drawGameScreen() {
     drawStatus();
-    nextYearButton.hidden = (currentEvent !== null); // Dölj knappen när val ska göras
+    nextYearButton.hidden = (currentEvent !== null);
     nextYearButton.draw();
 
     if (currentEvent) {
         fill(0);
         textAlign(LEFT);
-        textSize(22);
+        textSize(20);
         text(currentEvent.title, 50, 180);
         
         fill(50);
-        textSize(15);
-        textWrap(WORD);
-        text(currentEvent.description, 50, 220, width - 100);
+        textSize(14);
+        text(currentEvent.description, 50, 210, width - 100, 100);
 
         choiceButtons.forEach(btn => btn.draw());
     } else {
@@ -130,51 +124,91 @@ function drawGameScreen() {
         let context = getHistoricalContext(player.year);
         if(context.contextText) {
             fill(150, 0, 0);
-            textSize(14);
-            text("Historisk händelse: " + context.contextText, width/2, height/2);
+            textSize(12);
+            text("Historisk händelse: " + context.contextText, width/2, height/2 - 50, width - 100, 100);
         }
     }
+}
+
+function drawStatus() {
+    // Status panel
+    fill(240);
+    stroke(0);
+    rect(50, 50, width - 100, 100);
+    
+    fill(0);
+    textAlign(LEFT);
+    textSize(16);
+    text(`År: ${player.year} | Ålder: ${player.age}`, 60, 75);
+    
+    textSize(12);
+    text(`Ekonomi: ${player.economy} | Utbildning: ${player.education}`, 60, 95);
+    text(`Hälsa: ${player.health} | Mental hälsa: ${player.mentalHealth}`, 60, 110);
+    text(`Socialt kapital: ${player.socialCapital}`, 60, 125);
 }
 
 function drawEndScreen() {
     background(10, 20, 30);
     textAlign(CENTER);
     fill(255);
-    textSize(28);
+    textSize(24);
     text("Din Livsbana: En sammanfattning", width / 2, 50);
 
-    // Rita grafen
-    drawTimelineGraph();
+    // Enkel graf över ekonomisk utveckling
+    if (history.length > 1) {
+        stroke(100, 255, 100);
+        strokeWeight(2);
+        noFill();
+        beginShape();
+        for (let i = 0; i < history.length; i++) {
+            let x = map(i, 0, history.length - 1, 100, width - 100);
+            let y = map(history[i].economy, 0, 100, height - 150, 150);
+            vertex(x, y);
+        }
+        endShape();
+        
+        fill(100, 255, 100);
+        noStroke();
+        text("Ekonomisk utveckling", width/2, 120);
+    }
     
     fill(200);
     textSize(14);
-    text("Klicka för att reflektera över din resa.", width/2, height - 30);
+    text("Klicka för att reflektera över din resa.", width/2, height - 60);
+    
+    // Visa slutstatus
+    textAlign(LEFT);
+    fill(255);
+    textSize(12);
+    let finalText = `Slutstatus vid ${player.age} års ålder:\n`;
+    finalText += `Ekonomi: ${player.economy}\n`;
+    finalText += `Utbildning: ${player.education}\n`;
+    finalText += `Hälsa: ${player.health}\n`;
+    finalText += `Mental hälsa: ${player.mentalHealth}\n`;
+    finalText += `Socialt kapital: ${player.socialCapital}`;
+    
+    text(finalText, 50, height - 150);
 }
 
 function drawReflectionScreen() {
-     background(250);
-     textAlign(LEFT);
-     fill(0);
-     textSize(22);
-     text("Reflektion", 50, 50);
+    background(250);
+    textAlign(LEFT);
+    fill(0);
+    textSize(22);
+    text("Reflektion", 50, 50);
 
-     textSize(16);
-     textWrap(WORD);
-     let reflectionText = `Titta på din livsbana. Vilka faktorer tror du hade störst inverkan på ditt liv?\n\n- Hur påverkade din socioekonomiska bakgrund (${player.ses}) dina första år och dina utbildningsval?\n\n- Märkte du av några historiska händelser, som ekonomiska kriser eller högkonjunkturer?\n\n- Vissa val var kanske svårare att lyckas med. Detta simulerar strukturella hinder – idén att inte alla har samma reella möjlighet att genomföra ett val, även om det teoretiskt sett är "fritt".\n\n- Hur påverkade dina val din psykiska hälsa och ditt sociala kapital över tid?\n\nSpelet visar hur individens "fria vilja" alltid verkar inom ramen för de strukturer och förutsättningar som samhället och historien ger. Spela gärna igen för att se ett helt annat livsöde.`
-     text(reflectionText, 50, 120, width-100, height-150);
-     
-     textSize(14);
-     fill(100);
-     text("Klicka för att starta en ny simulering.", 50, height-50);
+    textSize(14);
+    let reflectionText = `Titta på din livsbana. Vilka faktorer hade störst inverkan?\n\n- Din socioekonomiska bakgrund (${player.ses}) påverkade dina möjligheter\n\n- Historiska händelser kunde förändra förutsättningarna\n\n- Vissa val var svårare att lyckas med - detta simulerar strukturella hinder\n\n- Spelet visar hur "fria val" verkar inom ramen för samhällets strukturer\n\nSpela gärna igen för att se ett annat livsöde.`;
+    text(reflectionText, 50, 100, width-100, height-150);
+    
+    textSize(12);
+    fill(100);
+    text("Klicka för att starta en ny simulering.", 50, height-30);
 }
 
-
-// ---- HJÄLP- OCH LOGIK-FUNKTIONER ----
-
 function advanceTime() {
-    if (currentEvent) return; // Kan inte gå vidare om ett val måste göras
+    if (currentEvent) return;
 
-    // Avsluta spelet vid 65
     if (player.age >= 65) {
         gameState = 'endScreen';
         return;
@@ -183,11 +217,12 @@ function advanceTime() {
     player.age++;
     player.year++;
 
-    // Små, årliga förändringar
+    // Årliga förändringar
     let context = getHistoricalContext(player.year);
     player.mentalHealth = constrain(player.mentalHealth + context.mentalHealthModifier + random(-1, 1), 0, 100);
+    player.health = constrain(player.health + random(-1, 0.5), 0, 100);
 
-    // Spara nuvarande status för grafen
+    // Spara status för grafen
     history.push({
         year: player.year,
         age: player.age,
@@ -197,7 +232,7 @@ function advanceTime() {
         socialCapital: player.socialCapital
     });
     
-    // Kolla om en händelse ska triggas
+    // Kolla efter händelser
     let foundEvent = allEvents.find(e => e.age === player.age);
     if (foundEvent) {
         currentEvent = foundEvent;
@@ -213,9 +248,49 @@ function setupEvent(eventData) {
         let btnY = 280 + index * 55;
         let btn = new Button(choice.text, 50, btnY, width - 100, 45, () => handleChoice(choice));
         
-        // Här implementeras de strukturella hindren
         if (!choice.condition(player)) {
             btn.disabled = true;
             btn.tooltip = "Detta val är inte tillgängligt för dig på grund av din bakgrund eller tidigare val.";
         }
-        choiceButtons.push(
+        choiceButtons.push(btn);
+    });
+}
+
+function handleChoice(choice) {
+    let success = random(100) > choice.difficulty;
+    
+    if (success) {
+        choice.effect(player);
+    } else {
+        choice.failEffect(player);
+    }
+    
+    // Begränsa värden
+    player.economy = constrain(player.economy, 0, 100);
+    player.education = constrain(player.education, 0, 100);
+    player.socialCapital = constrain(player.socialCapital, 0, 100);
+    player.mentalHealth = constrain(player.mentalHealth, 0, 100);
+    player.health = constrain(player.health, 0, 100);
+    
+    currentEvent = null;
+    choiceButtons = [];
+}
+
+function mousePressed() {
+    switch (gameState) {
+        case 'startScreen':
+            gameState = 'gameRunning';
+            break;
+        case 'gameRunning':
+            // Hantera knapptryck
+            nextYearButton.click();
+            choiceButtons.forEach(btn => btn.click());
+            break;
+        case 'endScreen':
+            gameState = 'reflection';
+            break;
+        case 'reflection':
+            resetGame();
+            break;
+    }
+}
