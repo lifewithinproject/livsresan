@@ -2,26 +2,880 @@
 <html lang="sv">
 <head>
   <meta charset="UTF-8">
-  <title>Livsbanan - Ett p5.js Spel</title>
+  <title>Livsbanan - En Modern Livssimulering</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
-  <script src="events.js"></script>
-  <script src="sketch.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
   
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
     body {
-      padding: 0;
       margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
       display: flex;
-      justify-content: center;
       align-items: center;
-      height: 100vh;
-      background-color: #f0f0f0;
+      justify-content: center;
     }
+    
     canvas {
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
     }
   </style>
 </head>
 <body>
+
+<script>
+// Moderna färger och design
+const colors = {
+  primary: '#6366f1',
+  secondary: '#8b5cf6',
+  accent: '#06b6d4',
+  success: '#10b981',
+  warning: '#f59e0b',
+  danger: '#ef4444',
+  dark: '#1f2937',
+  light: '#f9fafb',
+  text: '#374151',
+  textLight: '#6b7280',
+  background: '#ffffff',
+  backgroundDark: '#f3f4f6'
+};
+
+// Historisk kontext
+function getHistoricalContext(year) {
+    if (year >= 1991 && year <= 1995) {
+        return {
+            contextText: "90-talskrisen: Hög arbetslöshet och ekonomisk osäkerhet",
+            economyModifier: -15,
+            jobAvailability: 0.5,
+            icon: "📉"
+        };
+    }
+    if (year >= 1998 && year <= 2001) {
+        return {
+            contextText: "IT-bubblan: Enorma möjligheter inom teknik",
+            economyModifier: 10,
+            jobAvailability: 1.5,
+            icon: "💻"
+        };
+    }
+    if (year >= 2008 && year <= 2009) {
+        return {
+            contextText: "Finanskrisen: Global ekonomisk nedgång",
+            economyModifier: -10,
+            jobAvailability: 0.7,
+            icon: "🏦"
+        };
+    }
+    if (year >= 2020 && year <= 2021) {
+        return {
+            contextText: "COVID-19: Distansarbete och digitalisering",
+            economyModifier: -5,
+            jobAvailability: 0.8,
+            icon: "🦠"
+        };
+    }
+    return { contextText: "", economyModifier: 0, jobAvailability: 1.0, icon: "" };
+}
+
+// Spelhandelser
+const lifeEvents = [
+    {
+        age: 16,
+        title: "🎓 Gymnasieval",
+        description: "Ditt första stora val som kommer forma din framtid",
+        type: "choice",
+        choices: [
+            {
+                text: "Yrkesprogram - Praktisk inriktning",
+                condition: () => true,
+                difficulty: 10,
+                effect: (p) => { 
+                    p.education += 15;
+                    p.economy += 5;
+                    p.log.push("Valde yrkesprogram och fick praktisk kunskap");
+                }
+            },
+            {
+                text: "Studieförberedande - Teoretisk inriktning", 
+                condition: (p) => p.education > 40,
+                difficulty: 25,
+                effect: (p) => {
+                    p.education += 25;
+                    p.log.push("Satsade på teoretiska studier");
+                }
+            }
+        ]
+    },
+    {
+        age: 19,
+        title: "📚 Högre utbildning",
+        description: "Tiden att bestämma din utbildningsväg",
+        type: "choice", 
+        choices: [
+            {
+                text: "Prestigeuniversitet",
+                condition: (p) => p.education > 60 && (p.ses !== 'arbetarklass' || p.economy > 50),
+                difficulty: 40,
+                effect: (p) => {
+                    p.education += 35;
+                    p.economy -= 10;
+                    p.log.push("Läste på prestigeuniversitet och byggde nätverk");
+                }
+            },
+            {
+                text: "Lokal högskola",
+                condition: (p) => p.education > 50,
+                difficulty: 20,
+                effect: (p) => {
+                    p.education += 25;
+                    p.economy -= 5;
+                    p.log.push("Fick gedigen utbildning på lokal högskola");
+                }
+            },
+            {
+                text: "Yrkeshögskola",
+                condition: (p) => p.education > 35,
+                difficulty: 15,
+                effect: (p) => {
+                    p.education += 20;
+                    p.economy += 5;
+                    p.log.push("Specialiserade mig inom praktiskt yrke");
+                }
+            },
+            {
+                text: "Börja arbeta direkt",
+                condition: () => true,
+                difficulty: 0,
+                effect: (p) => {
+                    p.economy += 20;
+                    p.log.push("Började arbeta direkt och tjänade pengar");
+                }
+            }
+        ]
+    },
+    {
+        age: 25,
+        title: "💼 Karriärstart",
+        description: "Dags att etablera sig på arbetsmarknaden",
+        type: "choice",
+        choices: [
+            {
+                text: "Privat sektor - Högre lön, mer stress",
+                condition: (p) => p.education > 55,
+                difficulty: 30,
+                effect: (p) => {
+                    let context = getHistoricalContext(p.year);
+                    let bonus = Math.max(0, context.economyModifier);
+                    p.economy += 30 + bonus;
+                    p.log.push("Fick välbetalt jobb inom privat sektor");
+                }
+            },
+            {
+                text: "Offentlig sektor - Trygghet och balans",
+                condition: (p) => p.education > 45,
+                difficulty: 20,
+                effect: (p) => {
+                    p.economy += 20;
+                    p.log.push("Fick stabil tjänst inom offentlig sektor");
+                }
+            },
+            {
+                text: "Starta eget företag",
+                condition: (p) => p.education > 40 && p.economy > 30,
+                difficulty: 60,
+                effect: (p) => {
+                    p.economy += 40;
+                    p.log.push("Startade eget företag och blev framgångsrik");
+                },
+                failEffect: (p) => {
+                    p.economy -= 20;
+                    p.log.push("Företaget gick dåligt och jag förlorade pengar");
+                }
+            }
+        ]
+    },
+    {
+        age: 35,
+        title: "🏠 Etablering",
+        description: "Tid för större investeringar och livsval",
+        type: "simulation",
+        simulate: (p) => {
+            if (p.economy > 70) {
+                p.economy += 15;
+                p.log.push("Köpte bostad och byggde förmögenhet");
+                return "Stark ekonomi möjliggjorde bostadsköp och investeringar";
+            } else if (p.economy > 40) {
+                p.economy += 5;
+                p.log.push("Lyckades spara och investera måttligt");
+                return "Måttlig ekonomi gav viss sparkapacitet";
+            } else {
+                p.log.push("Kämpade ekonomiskt och kunde inte spara");
+                return "Svag ekonomi begränsade möjligheterna att bygga förmögenhet";
+            }
+        }
+    },
+    {
+        age: 45,
+        title: "📈 Karriärutveckling",
+        description: "Möjligheter för avancemang och nya utmaningar",
+        type: "choice",
+        choices: [
+            {
+                text: "Satsa på ledarskap och avancemang",
+                condition: (p) => p.education > 60 && p.economy > 50,
+                difficulty: 35,
+                effect: (p) => {
+                    p.economy += 25;
+                    p.log.push("Avancerade till ledande position");
+                }
+            },
+            {
+                text: "Vidareutbilda sig för karriärsskifte",
+                condition: (p) => p.economy > 40,
+                difficulty: 40,
+                effect: (p) => {
+                    p.education += 20;
+                    p.economy -= 10;
+                    p.log.push("Bytte karriär genom vidareutbildning");
+                }
+            },
+            {
+                text: "Fortsätt på samma spår",
+                condition: () => true,
+                difficulty: 10,
+                effect: (p) => {
+                    p.economy += 10;
+                    p.log.push("Fortsatte med trygg och stabil karriär");
+                }
+            }
+        ]
+    }
+];
+
+// Spelare och spelvariabler
+let gameState = 'intro';
+let player = null;
+let history = [];
+let currentEvent = null;
+let choiceButtons = [];
+let animationProgress = 0;
+let transitionTimer = 0;
+let chartCanvas, chart;
+
+// Huvudfunktioner
+function setup() {
+    createCanvas(1000, 700);
+    textFont('Arial');
+    initializeGame();
+}
+
+function initializeGame() {
+    const sesChoices = ['arbetarklass', 'medelklass', 'överklass'];
+    const locationChoices = ['småstad', 'medelstor stad', 'storstad'];
+    const genderChoices = ['man', 'kvinna'];
+    
+    let ses = random(sesChoices);
+    let location = random(locationChoices);
+
+    player = {
+        birthYear: int(random(1970, 2005)),
+        gender: random(genderChoices),
+        ses: ses,
+        location: location,
+        age: 0,
+        year: 0,
+        education: 0,
+        economy: 0,
+        log: [],
+        completedEvents: []
+    };
+    
+    // Startförutsättningar baserat på klass
+    switch(ses) {
+        case 'arbetarklass':
+            player.economy = int(random(5, 20));
+            player.education = int(random(25, 45));
+            break;
+        case 'medelklass':
+            player.economy = int(random(25, 45));
+            player.education = int(random(40, 60));
+            break;
+        case 'överklass':
+            player.economy = int(random(50, 75));
+            player.education = int(random(55, 75));
+            break;
+    }
+    
+    player.year = player.birthYear;
+    history = [];
+    currentEvent = null;
+    choiceButtons = [];
+    gameState = 'intro';
+}
+
+function draw() {
+    // Gradient bakgrund
+    drawGradientBackground();
+    
+    switch (gameState) {
+        case 'intro':
+            drawIntroScreen();
+            break;
+        case 'simulation':
+            drawSimulationScreen();
+            break;
+        case 'choice':
+            drawChoiceScreen();
+            break;
+        case 'summary':
+            drawSummaryScreen();
+            break;
+        case 'reflection':
+            drawReflectionScreen();
+            break;
+    }
+    
+    // Automatisk progression
+    handleAutomaticProgression();
+}
+
+function drawGradientBackground() {
+let pos = getSocialPosition();
+let topColor, bottomColor;
+
+switch(pos) {
+    case 'överklass':
+        topColor = color(242, 245, 255);
+        bottomColor = color(195, 215, 255);
+        break;
+    case 'medelklass':
+        topColor = color(240, 240, 240);
+        bottomColor = color(180, 180, 180);
+        break;
+    case 'arbetarklass':
+    default:
+        topColor = color(80, 80, 80);
+        bottomColor = color(40, 40, 40);
+        break;
+}
+    
+
+for(let i = 0; i <= height; i++) {
+        let inter = map(i, 0, height, 0, 1);
+        let c = lerpColor(topColor, bottomColor, inter);
+
+        stroke(c);
+        line(0, i, width, i);
+    }
+
+
+}
+
+function drawIntroScreen() {
+    // Huvudtitel
+    drawCard(width/2 - 400, 100, 800, 500, colors.background);
+    
+    fill(colors.dark);
+    textAlign(CENTER, CENTER);
+    textSize(36);
+    textStyle(BOLD);
+    text('🎯 Livsbanan', width/2, 180);
+    
+    textSize(18);
+    textStyle(NORMAL);
+    fill(colors.textLight);
+    text('En interaktiv simulering av livets val och möjligheter', width/2, 220);
+    
+    // Spelarinfo
+    textSize(16);
+    fill(colors.text);
+    let introText = `Du föddes ${player.birthYear} som ${player.gender}\ni en ${player.ses}-familj i en ${player.location}.\n\nDina startförutsättningar:\n🎓 Utbildning: ${player.education}\n💰 Ekonomi: ${player.economy}\n\nDessa kommer att påverka vilka dörrar som öppnas för dig.`;
+    text(introText, width/2, 350);
+    
+    // Instruktioner
+    drawButton(width/2 - 100, 500, 200, 50, '🚀 Starta din resa', colors.primary);
+}
+
+
+function drawProgressChartSmall() {
+    if (history.length < 2) return;
+    
+    let chartX = width - 320;
+    let chartY = 80;
+    let chartW = 250;
+    let chartH = 100;
+
+    fill(255, 240);
+    noStroke();
+    rect(chartX, chartY, chartW, chartH, 10);
+
+    // Utbildning (blå)
+    stroke(colors.accent);
+    noFill();
+    strokeWeight(2);
+    beginShape();
+    for (let i = 0; i < history.length; i++) {
+        let x = map(i, 0, history.length - 1, chartX + 10, chartX + chartW - 10);
+        let y = map(history[i].education, 0, 100, chartY + chartH - 10, chartY + 10);
+        vertex(x, y);
+    }
+    endShape();
+
+    // Ekonomi (grön)
+    stroke(colors.success);
+    beginShape();
+    for (let i = 0; i < history.length; i++) {
+        let x = map(i, 0, history.length - 1, chartX + 10, chartX + chartW - 10);
+        let y = map(history[i].economy, 0, 100, chartY + chartH - 10, chartY + 10);
+        vertex(x, y);
+    }
+    endShape();
+}
+
+function drawSimulationScreen() {
+    drawCard(width/2 - 450, 50, 900, 600, colors.background);
+    
+if (player.feedback) {
+    fill(colors.accent);
+    textSize(14);
+    textAlign(CENTER);
+    text(player.feedback, width/2, 500, 800, 100);
+}
+    
+// År och ålder
+    fill(colors.dark);
+    textAlign(CENTER, CENTER);
+    textSize(28);
+    textStyle(BOLD);
+    text(`År ${player.year} • ${player.age} år gammal`, width/2, 120);
+    
+    // Historisk kontext
+    let context = getHistoricalContext(player.year);
+    if (context.contextText) {
+        textSize(16);
+        fill(colors.warning);
+        text(`${context.icon} ${context.contextText}`, width/2, 160);
+    }
+    
+    // Nuvarande status
+    drawStatusBars();
+    
+    // Livshändelse eller automatisk progression
+    if (currentEvent) {
+        if (currentEvent.type === 'simulation') {
+            textSize(20);
+            fill(colors.text);
+            text(`📊 ${currentEvent.title}`, width/2, 300);
+            
+            textSize(14);
+            fill(colors.textLight);
+            text(currentEvent.description, width/2, 340);
+            
+            // Visa simuleringsresultat
+            if (transitionTimer > 60) {
+                let result = currentEvent.simulate(player);
+                textSize(16);
+                fill(colors.success);
+                text(result, width/2, 400, 700, 100);
+            }
+        }
+    } else {
+        // Automatisk åldring
+        textSize(18);
+        fill(colors.textLight);
+        text('⏳ Livet går vidare...', width/2, 350);
+    }
+
+if (transitionTimer > 60 && currentEvent && currentEvent.simulate) {
+    let result = currentEvent.simulate(player);
+    player.feedback = result;
+    textSize(16);
+    fill(colors.success);
+    text(result, width/2, 400, 700, 100);
+}
+drawProgressChartSmall();
+}
+
+
+
+function drawChoiceScreen() {
+    drawCard(width/2 - 450, 50, 900, 600, colors.background);
+    
+    if (currentEvent) {
+        // Titel
+        fill(colors.dark);
+        textAlign(CENTER, CENTER);
+        textSize(28);
+        textStyle(BOLD);
+        text(currentEvent.title, width/2, 120);
+        
+        // Beskrivning
+        textSize(16);
+        fill(colors.text);
+        text(currentEvent.description, width/2, 160);
+        
+        // Status
+        drawStatusBars();
+        
+        
+// Val
+let startY = 300;
+currentEvent.choices.forEach((choice, index) => {
+    let available = choice.condition(player);
+    let color = available ? colors.primary : colors.textLight;
+    let successRate = 100 - (choice.difficulty || 0); // Sannolikhet i procent
+    let probText = available ? ` (🧮 Sannolikhet: ${successRate}%)` : '';
+
+    let buttonText = available ? `${choice.text}${probText}` : `🔒 ${choice.text} (Inte tillgängligt)`;
+
+    drawButton(width/2 - 300, startY + index * 70, 600, 50, buttonText, color);
+let explanationY = startY + index * 70 + 55;
+fill(colors.textLight);
+textSize(12);
+
+if (available) {
+    text(`Tillgängligt eftersom du har ${player.education} utbildning och ${player.economy} ekonomi`, width/2, explanationY);
+} else {
+    text(`Otillgängligt p.g.a. otillräcklig utbildning eller ekonomi`, width/2, explanationY);
+}
+
+});
+    }
+}
+
+
+function getSocialPosition() {
+    let score = (player.economy + player.education) / 2;
+    if (score > 75) return 'överklass';
+    if (score > 45) return 'medelklass';
+    return 'arbetarklass';
+}
+
+
+function drawSummaryScreen() {
+    drawCard(width/2 - 450, 50, 900, 600, colors.background);
+    
+    fill(colors.dark);
+    textAlign(CENTER, CENTER);
+    textSize(32);
+    textStyle(BOLD);
+    text('📈 Din Livsbana', width/2, 120);
+    
+    // Slutstatus
+    textSize(18);
+    fill(colors.text);
+    text(`Vid ${player.age} års ålder:`, width/2, 170);
+    
+    // Status bars
+    drawFinalStatusBars();
+    
+    // Graf
+    drawProgressChart();
+    
+    // Fortsätt knapp
+    drawButton(width/2 - 100, 550, 200, 50, '🤔 Reflektera', colors.secondary);
+}
+
+function drawReflectionScreen() {
+    drawCard(width/2 - 450, 50, 900, 600, colors.background);
+    
+    fill(colors.dark);
+    textAlign(CENTER, CENTER);
+    textSize(28);
+    textStyle(BOLD);
+    text('💭 Reflektion', width/2, 120);
+    
+    textAlign(LEFT);
+    textSize(14);
+    fill(colors.text);
+    let reflectionText = `Vad lärde du dig om livets val och möjligheter?\n\n• Din socioekonomiska bakgrund (${player.ses}) påverkade dina startförutsättningar\n\n• Historiska händelser förändrade möjlighetslandskapet\n\n• Vissa val var otillgängliga baserat på tidigare beslut\n\n• Strukturella faktorer begränsade eller möjliggjorde framgång\n\n• "Fria val" existerar alltid inom samhälleliga ramar\n\nVill du utforska ett annat livsförlopp?`;
+    
+    text(reflectionText, width/2 - 350, 180, 700, 300);
+    
+    textAlign(CENTER);
+    drawButton(width/2 - 100, 550, 200, 50, '🔄 Nytt liv', colors.primary);
+fill(colors.text);
+textAlign(LEFT);
+textSize(12);
+
+let logText = player.log.join('\n');
+text(logText, width/2 - 350, 300, 700, 250);
+
+}
+
+// Hjälpfunktioner för grafik
+function drawCard(x, y, w, h, color) {
+    fill(color);
+    stroke(0, 0, 0, 20);
+    strokeWeight(2);
+    rect(x, y, w, h, 20);
+    noStroke();
+}
+
+function drawButton(x, y, w, h, label, color) {
+    fill(color);
+    rect(x, y, w, h, 10);
+    
+    fill(255);
+    textAlign(CENTER, CENTER);
+    textSize(16);
+    textStyle(NORMAL);
+    text(label, x + w/2, y + h/2);
+}
+
+function drawStatusBars() {
+    let barY = 220;
+    let barWidth = 300;
+    let barHeight = 20;
+    
+    // Utbildning
+    fill(colors.textLight);
+    text('🎓 Utbildning', width/2 - 150, barY);
+    drawProgressBar(width/2 - 150, barY + 10, barWidth, barHeight, player.education, colors.accent);
+    
+    // Ekonomi  
+    fill(colors.textLight);
+    text('💰 Ekonomi', width/2 - 150, barY + 50);
+    drawProgressBar(width/2 - 150, barY + 60, barWidth, barHeight, player.economy, colors.success);
+}
+
+function drawFinalStatusBars() {
+    let barY = 200;
+    let barWidth = 400;
+    let barHeight = 30;
+    
+    textAlign(LEFT);
+    textSize(16);
+    
+    // Utbildning
+    fill(colors.text);
+    text(`🎓 Utbildning: ${player.education}/100`, width/2 - 200, barY);
+    drawProgressBar(width/2 - 200, barY + 10, barWidth, barHeight, player.education, colors.accent);
+    
+    // Ekonomi
+    fill(colors.text);
+    text(`💰 Ekonomi: ${player.economy}/100`, width/2 - 200, barY + 80);
+    drawProgressBar(width/2 - 200, barY + 90, barWidth, barHeight, player.economy, colors.success);
+}
+
+function drawProgressBar(x, y, w, h, value, color) {
+    // Bakgrund
+    fill(240);
+    rect(x, y, w, h, h/2);
+    
+    // Progress
+    fill(color);
+    let progressWidth = map(constrain(value, 0, 100), 0, 100, 0, w);
+    rect(x, y, progressWidth, h, h/2);
+}
+
+function drawProgressChart() {
+    if (history.length < 2) return;
+    
+    // Rita en enkel graf
+    let chartX = width/2 - 300;
+    let chartY = 350;
+    let chartW = 600;
+    let chartH = 150;
+    
+    // Bakgrund
+    fill(250);
+    rect(chartX, chartY, chartW, chartH);
+    
+    // Utbildningslinje
+    stroke(colors.accent);
+    strokeWeight(3);
+    noFill();
+    beginShape();
+    for (let i = 0; i < history.length; i++) {
+        let x = map(i, 0, history.length - 1, chartX + 20, chartX + chartW - 20);
+        let y = map(history[i].education, 0, 100, chartY + chartH - 20, chartY + 20);
+        vertex(x, y);
+    }
+    endShape();
+    
+    // Ekonomilinje
+    stroke(colors.success);
+    beginShape();
+    for (let i = 0; i < history.length; i++) {
+        let x = map(i, 0, history.length - 1, chartX + 20, chartX + chartW - 20);
+        let y = map(history[i].economy, 0, 100, chartY + chartH - 20, chartY + 20);
+        vertex(x, y);
+    }
+    endShape();
+    
+    noStroke();
+    
+    // Legend
+    fill(colors.accent);
+    rect(chartX + 20, chartY + chartH + 10, 20, 10);
+    fill(colors.text);
+    textAlign(LEFT);
+    textSize(12);
+    text('Utbildning', chartX + 50, chartY + chartH + 20);
+    
+    fill(colors.success);
+    rect(chartX + 150, chartY + chartH + 10, 20, 10);
+    fill(colors.text);
+    text('Ekonomi', chartX + 180, chartY + chartH + 20);
+}
+
+// Spellogik
+function handleAutomaticProgression() {
+    transitionTimer++;
+    
+    if (gameState === 'simulation') {
+        if (!currentEvent) {
+            // Automatisk åldring
+            if (transitionTimer > 90) {
+                advanceAge();
+                transitionTimer = 0;
+		player.feedback = null;
+            }
+        } else if (currentEvent.type === 'simulation') {
+            // Vänta på simulering
+            if (transitionTimer > 120) {
+                completeEvent();
+                transitionTimer = 0;
+            }
+        }
+    }
+}
+
+function advanceAge() {
+    player.age++;
+    player.year++;
+
+    // Spara historik
+    history.push({
+        age: player.age,
+        year: player.year,
+        education: player.education,
+        economy: player.economy
+    });
+
+    // Logga året
+    let yearLog = `📅 ${player.year}: `;
+    let event = lifeEvents.find(e => e.age === player.age && !player.completedEvents.includes(e.age));
+    if (event) {
+        yearLog += `Livshändelse – ${event.title}`;
+    } else {
+        yearLog += `Inga särskilda händelser`;
+    }
+    player.log.push(yearLog);
+
+    // Slutår
+    if (player.year >= 2025) {
+        gameState = 'summary';
+        return;
+    }
+
+    // Kolla efter händelser
+    if (event) {
+        currentEvent = event;
+        if (event.type === 'choice') {
+            gameState = 'choice';
+        } else {
+            gameState = 'simulation';
+        }
+    }
+}
+
+
+function completeEvent() {
+    if (currentEvent) {
+        player.completedEvents.push(currentEvent.age);
+        currentEvent = null;
+    }
+    gameState = 'simulation';
+}
+
+function makeChoice(choiceIndex) {
+    if (!currentEvent || !currentEvent.choices[choiceIndex]) return;
+
+    let choice = currentEvent.choices[choiceIndex];
+    if (!choice.condition(player)) return;
+
+    // Bestäm framgång baserat på svårighet
+    let success = random(100) > (choice.difficulty || 0);
+
+    // Bygg feedback-text
+    let explanation = `🎯 Du valde "${choice.text}". `;
+    explanation += `Dina förutsättningar var utbildning: ${player.education}, ekonomi: ${player.economy} – `;
+    explanation += `sannolikhet för framgång: ${100 - (choice.difficulty || 0)}%. `;
+
+    // Utför effekt
+    if (success) {
+        if (choice.effect) choice.effect(player);
+        explanation += `✅ Det gick vägen!`;
+    } else {
+        if (choice.failEffect) {
+            choice.failEffect(player);
+            explanation += `❌ Det misslyckades.`;
+        } else {
+            explanation += `❌ Det gav inget resultat.`;
+        }
+    }
+
+    player.feedback = explanation;
+	
+player.log.push(`🎯 Val: ${choice.text} – ${success ? "lyckades" : "misslyckades"}`);
+
+
+    // Begränsa värden
+    player.education = constrain(player.education, 0, 100);
+    player.economy = constrain(player.economy, 0, 100);
+
+    completeEvent();
+}
+
+
+
+// Eventhantering
+function mousePressed() {
+    switch (gameState) {
+        case 'intro':
+            if (mouseX > width/2 - 100 && mouseX < width/2 + 100 && 
+                mouseY > 500 && mouseY < 550) {
+                gameState = 'simulation';
+                transitionTimer = 0;
+            }
+            break;
+            
+        case 'choice':
+            if (currentEvent && currentEvent.choices) {
+                let startY = 300;
+                currentEvent.choices.forEach((choice, index) => {
+                    let buttonY = startY + index * 70;
+                    if (mouseX > width/2 - 300 && mouseX < width/2 + 300 &&
+                        mouseY > buttonY && mouseY < buttonY + 50) {
+                        makeChoice(index);
+                    }
+                });
+            }
+            break;
+            
+        case 'summary':
+            if (mouseX > width/2 - 100 && mouseX < width/2 + 100 && 
+                mouseY > 550 && mouseY < 600) {
+                gameState = 'reflection';
+            }
+            break;
+            
+        case 'reflection':
+            if (mouseX > width/2 - 100 && mouseX < width/2 + 100 && 
+                mouseY > 550 && mouseY < 600) {
+                initializeGame();
+            }
+            break;
+    }
+}
+</script>
+
 </body>
 </html>
