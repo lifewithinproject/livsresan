@@ -1,17 +1,46 @@
 <!DOCTYPE html>
-<html>
+<html lang="sv">
 <head>
-  <title>ClioVis-liknande tidslinje</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Historisk Tidslinje + Samband</title>
+
+  <!-- Vis Timeline -->
+  <link href="https://unpkg.com/vis-timeline@latest/styles/vis-timeline-graph2d.min.css" rel="stylesheet" />
   <script src="https://unpkg.com/vis-timeline@latest/standalone/umd/vis-timeline-graph2d.min.js"></script>
-  <script src="https://unpkg.com/cytoscape@3.21.0/dist/cytoscape.min.js"></script>
+
+  <!-- PapaParse -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 2em;
+    }
+    #timeline {
+      height: 300px;
+      border: 1px solid #ccc;
+    }
+    #info-box {
+      margin-top: 20px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      background: #f9f9f9;
+    }
+    img {
+      max-width: 100%;
+      height: auto;
+      margin-top: 10px;
+    }
+  </style>
 </head>
 <body>
+
   <h1>Historisk Tidslinje + Samband</h1>
   <div id="timeline"></div>
-  <div id="cy"></div>
-<div id="info-box" style="margin-top: 20px; padding: 10px; border: 1px solid #ddd; border-radius: 6px; background: #f9f9f9;"></div>
+  <div id="info-box"><em>Klicka på en händelse för mer information.</em></div>
+
   <script src="app.js"></script>
 </body>
 </html>
