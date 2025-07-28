@@ -1,4 +1,4 @@
 Händelsetitel,Datum,Beskrivning,Kategori,Källor,Bildlänk,Kopplingar
-Slaget vid Lützen,1632-11-16,"Gustav II Adolf dör i dimma",Krig,"https://sv.wikipedia.org/wiki/Slaget_vid_Lützen",https://exempel.se/bild1.jpg,X
-Franska revolutionen,1789-07-14,"Stormningen av Bastiljen markerar början",Revolution,"https://sv.wikipedia.org/wiki/Franska_revolutionen",https://exempel.se/bild2.jpg,X
-Månraketen Apollo 11,1969-07-20,"Första människan på månen",Vetenskap,"https://sv.wikipedia.org/wiki/Apollo_11",https://exempel.se/bild3.jpg,X
+Slaget vid Lützen,1632-11-16,"Gustav II Adolf dör i dimma",Krig,"https://sv.wikipedia.org/wiki/Slaget_vid_Lützen",https://exempel.se/bild1.jpg,"X"
+Franska revolutionen,1789-07-14,"Stormningen av Bastiljen markerar början",Revolution,"https://sv.wikipedia.org/wiki/Franska_revolutionen",https://exempel.se/bild2.jpg,"X"
+Månraketen Apollo 11,1969-07-20,"Första människan på månen",Vetenskap,"https://sv.wikipedia.org/wiki/Apollo_11",https://exempel.se/bild3.jpg,"X"
