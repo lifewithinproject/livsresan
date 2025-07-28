@@ -1,25 +1,50 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Livsresan ClioVis-liknande demo</title>
-  <link href="https://unpkg.com/vis-timeline/styles/vis-timeline-graph2d.min.css" rel="stylesheet" />
-  <link href="style.css" rel="stylesheet" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Livsresan Tidslinje</title>
+
+    <!-- Vis Timeline CSS -->
+    <link href="https://unpkg.com/vis-timeline@7.8.6/styles/vis-timeline-graph2d.min.css" rel="stylesheet" />
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f0f0f0;
+        }
+        #timeline {
+            margin: 20px auto;
+            width: 90%;
+            height: 400px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        #network {
+            margin: 20px auto;
+            width: 90%;
+            height: 400px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+    </style>
 </head>
 <body>
-  <h1>Livsresan - ClioVis-liknande demo</h1>
-  <div id="container">
-    <div id="timeline"></div>
-    <div id="graph"></div>
-  </div>
-  <div id="details">
-    <h2>Detaljer</h2>
-    <div id="details-content">Klicka på en händelse för mer info</div>
-  </div>
+    <h1 style="text-align:center;">Livsresan Tidslinje och Samband</h1>
 
-  <script src="https://unpkg.com/vis-timeline/standalone/umd/vis-timeline-graph2d.min.js"></script>
-  <script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
-  <script src="app.js"></script>
+    <div id="timeline"></div>
+    <div id="network"></div>
+
+    <!-- Bibliotek -->
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+    <script src="https://unpkg.com/vis-timeline@7.8.6/standalone/umd/vis-timeline-graph2d.min.js"></script>
+    <script src="https://unpkg.com/cytoscape@3.24.1/dist/cytoscape.min.js"></script>
+
+    <!-- Din app.js -->
+    <script src="app.js"></script>
 </body>
 </html>
