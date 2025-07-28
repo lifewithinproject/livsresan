@@ -1,4 +1,9 @@
 Händelsetitel,Datum,Beskrivning,Kategori,Källor,Bildlänk,Kopplingar
-Slaget vid Lützen,1632-11-16,"Gustav II Adolf dör i dimma",Krig,"https://sv.wikipedia.org/wiki/Slaget_vid_Lützen",https://exempel.se/bild1.jpg,"X"
-Franska revolutionen,1789-07-14,"Stormningen av Bastiljen markerar början",Revolution,"https://sv.wikipedia.org/wiki/Franska_revolutionen",https://exempel.se/bild2.jpg,"X"
-Månraketen Apollo 11,1969-07-20,"Första människan på månen",Vetenskap,"https://sv.wikipedia.org/wiki/Apollo_11",https://exempel.se/bild3.jpg,"X"
+Slaget vid Lützen,1632-11-16,"Gustav II Adolf dör i dimma",Krig,https://sv.wikipedia.org/wiki/Slaget_vid_Lützen,https://exempel.se/bild1.jpg,Franska revolutionen
+Franska revolutionen,1789-07-14,"Stormningen av Bastiljen markerar början",Revolution,https://sv.wikipedia.org/wiki/Franska_revolutionen,https://exempel.se/bild2.jpg,Månraketen Apollo 11
+Månraketen Apollo 11,1969-07-20,"Första människan på månen",Vetenskap,https://sv.wikipedia.org/wiki/Apollo_11,https://exempel.se/bild3.jpg,
+Industriella revolutionen,1760-01-01,"Omvälvande teknologiska framsteg",Revolution,https://sv.wikipedia.org/wiki/Industriella_revolutionen,https://exempel.se/bild4.jpg,Franska revolutionen
+Första världskriget,1914-07-28,"Krigets utbrott i Europa",Krig,https://sv.wikipedia.org/wiki/Första_världskriget,https://exempel.se/bild5.jpg,Slaget vid Lützen
+Ryska revolutionen,1917-11-07,"Kommunisternas maktövertagande",Revolution,https://sv.wikipedia.org/wiki/Ryska_revolutionen,https://exempel.se/bild6.jpg,Första världskriget
+Atombomben över Hiroshima,1945-08-06,"Första användningen av kärnvapen i krig",Krig,https://sv.wikipedia.org/wiki/Atombomben_över_Hiroshima,https://exempel.se/bild7.jpg,Månraketen Apollo 11
+Internetets födelse,1983-01-01,"Starten av moderna internet",Vetenskap,https://sv.wikipedia.org/wiki/Internet,https://exempel.se/bild8.jpg,Månraketen Apollo 11
