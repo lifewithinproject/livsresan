@@ -1,4 +1,4 @@
 Händelsetitel,Datum,Beskrivning,Kategori,Källor,Bildlänk,Kopplingar
-Slaget vid X,1820-05-14,En viktig strid mellan armé A och B,Krig,Källa 1,https://bild.se/x.jpg,Uppror Y; Händelse Z
-Uppror Y,1819-01-01,Uppror mot styret i regionen,Politik,Bok Z, s. 23,https://bild.se/y.jpg,Slaget vid X
-Händelse Z,1821-07-20,Betydande politisk förändring,Politik,Källa 2,,Slaget vid X
+Slaget vid Lützen,1632-11-16,"Gustav II Adolf dör i dimma",Krig,"https://sv.wikipedia.org/wiki/Slaget_vid_Lützen",https://exempel.se/bild1.jpg,
+Franska revolutionen,1789-07-14,"Stormningen av Bastiljen markerar början",Revolution,"https://sv.wikipedia.org/wiki/Franska_revolutionen",https://exempel.se/bild2.jpg,
+Månraketen Apollo 11,1969-07-20,"Första människan på månen",Vetenskap,"https://sv.wikipedia.org/wiki/Apollo_11",https://exempel.se/bild3.jpg,
