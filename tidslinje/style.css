@@ -1,14 +1,41 @@
 body {
-  font-family: sans-serif;
-  padding: 10px;
+  font-family: Arial, sans-serif;
+  margin: 10px;
+  background: #f9f9f9;
+  color: #333;
+}
+
+h1 {
+  text-align: center;
+}
+
+#container {
+  display: flex;
+  gap: 20px;
+  height: 400px;
 }
 
 #timeline {
-  height: 300px;
-  margin-bottom: 20px;
+  flex: 1;
+  border: 1px solid #ddd;
+  background: white;
 }
 
-#cy {
-  height: 500px;
-  border: 1px solid #aaa;
+#graph {
+  flex: 1;
+  border: 1px solid #ddd;
+  background: white;
+  position: relative;
+}
+
+#details {
+  margin-top: 20px;
+  border: 1px solid #ddd;
+  padding: 15px;
+  background: white;
+}
+
+#details-content img {
+  max-width: 100%;
+  margin-top: 10px;
 }
