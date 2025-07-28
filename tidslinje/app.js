@@ -1,48 +1,41 @@
+// Ladda CSV och skapa vis-timeline
 Papa.parse("data.csv", {
-  header: true,
   download: true,
+  header: true,
   complete: function(results) {
     const data = results.data;
 
-    // --- TIDSLINJE ---
-    const items = data.map((row, i) => ({
-      id: i,
-      content: row['Händelsetitel'],
-      start: row['Datum'],
-      title: row['Beskrivning'],
-      group: row['Kategori']
-    }));
+    const timelineItems = data
+      .filter(item => item["Datum"] && item["Händelsetitel"])
+      .map((item, index) => ({
+        id: index,
+        content: item["Händelsetitel"],
+        start: item["Datum"],
+        title: item["Beskrivning"] || "",
+        group: item["Kategori"] || "",
+        // valfritt: man kan använda detta för mer info
+        description: item["Beskrivning"],
+        source: item["Källor"],
+        image: item["Bildlänk"],
+        relations: item["Kopplingar"]
+      }));
 
-    const container = document.getElementById('timeline');
-    const timeline = new vis.Timeline(container, items);
-
-    // --- NÄTVERK ---
-    const nodes = data.map((row, i) => ({
-      data: { id: row['Händelsetitel'], label: row['Händelsetitel'] }
-    }));
-
-    const edges = [];
-    data.forEach(row => {
-      if (row['Kopplingsdata']) {
-        row['Kopplingsdata'].split(';').forEach(target => {
-          edges.push({
-            data: {
-              source: row['Händelsetitel'],
-              target: target.trim()
-            }
-          });
-        });
+    // Skapa timeline
+    const container = document.getElementById("timeline");
+    const options = {
+      tooltip: {
+        followMouse: true,
+        overflowMethod: 'cap'
+      },
+      stack: true,
+      zoomable: true,
+      selectable: true,
+      margin: {
+        item: 10,
+        axis: 5
       }
-    });
+    };
 
-    const cy = cytoscape({
-      container: document.getElementById('cy'),
-      elements: { nodes, edges },
-      layout: { name: 'cose' },
-      style: [
-        { selector: 'node', style: { 'label': 'data(label)', 'background-color': '#0074D9', 'color': '#fff', 'text-valign': 'center', 'text-halign': 'center' } },
-        { selector: 'edge', style: { 'line-color': '#ccc' } }
-      ]
-    });
+    const timeline = new vis.Timeline(container, timelineItems, options);
   }
 });
