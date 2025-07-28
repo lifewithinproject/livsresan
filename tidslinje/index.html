@@ -1,50 +1,42 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Livsresan Tidslinje</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tidslinje & Samband</title>
 
-    <!-- Vis Timeline CSS från jsDelivr -->
-    <link href="libs/vis-timeline-graph2d.min.css" rel="stylesheet" />
+  <!-- Lokal CSS för vis-timeline -->
+  <link rel="stylesheet" href="libs/vis-timeline/vis-timeline-graph2d.min.css" />
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background: #f0f0f0;
-        }
-        #timeline {
-            margin: 20px auto;
-            width: 90%;
-            height: 400px;
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-        #network {
-            margin: 20px auto;
-            width: 90%;
-            height: 400px;
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-    </style>
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      flex-direction: row;
+      height: 100vh;
+      font-family: sans-serif;
+    }
+
+    #timeline {
+      flex: 1;
+      border-right: 1px solid #ccc;
+    }
+
+    #graph {
+      flex: 1;
+    }
+  </style>
 </head>
 <body>
-    <h1 style="text-align:center;">Livsresan Tidslinje och Samband</h1>
+  <div id="timeline"></div>
+  <div id="graph"></div>
 
-    <div id="timeline"></div>
-    <div id="network"></div>
+  <!-- Lokala JS-bibliotek -->
+  <script src="libs/papaparse/papaparse.min.js"></script>
+  <script src="libs/vis-timeline/vis-timeline-graph2d.min.js"></script>
+  <script src="libs/cytoscape/cytoscape.min.js"></script>
 
-    <!-- Bibliotek -->
-    <script src="libs/papaparse.min.js"></script>
-    <script src="libs/vis-timeline-graph2d.min.js"></script>
-    <script src="libs/cytoscape.min.js"></script>
-
-    <!-- Din app.js -->
-    <script src="app.js"></script>
+  <!-- Din logik -->
+  <script src="app.js"></script>
 </body>
 </html>
