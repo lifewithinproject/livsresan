@@ -1,180 +1,155 @@
-Papa.parse("data.csv", {
-  download: true,
-  header: true,
-  skipEmptyLines: true,
-  complete: function(results) {
-    const data = results.data;
+// Ladda data.json och initiera tidslinje och grafvy
 
-    const categoryColors = {
-      "Krig": "red",
-      "Revolution": "blue",
-      "Vetenskap": "green"
-    };
+async function loadData() {
+  const response = await fetch('data.json');
+  return await response.json();
+}
 
-    // --- Skapa items för tidslinjen ---
-    const timelineItems = data
-      .filter(item =>
-        item["Datum"] &&
-        item["Händelsetitel"] &&
-        /^\d{4}-\d{2}-\d{2}$/.test(item["Datum"])
-      )
-      .map((item, index) => ({
-        id: index,
-        content: item["Händelsetitel"],
-        start: item["Datum"],
-        title: item["Beskrivning"] || "",
-        group: item["Kategori"] || "",
-        description: item["Beskrivning"],
-        source: item["Källor"],
-        image: item["Bildlänk"],
-        relations: item["Kopplingar"],
-        style: `background-color: ${categoryColors[item["Kategori"]] || "#666"}; color: white; border-radius: 4px; padding: 4px;`
-      }));
+function createTimelineItems(events) {
+  return events.map(ev => ({
+    id: ev.id,
+    content: ev.title,
+    start: ev.start,
+    end: ev.end || undefined,
+    title: ev.description,
+    className: ev.categories ? ev.categories.join(' ') : ''
+  }));
+}
 
-    // --- Initiera tidslinje ---
-    const timelineContainer = document.getElementById("timeline");
-    const timelineOptions = {
-      tooltip: { followMouse: true },
-      stack: true,
-      zoomable: true,
-      margin: {
-        item: 10,
-        axis: 5
-      }
-    };
-    const timeline = new vis.Timeline(timelineContainer, timelineItems, timelineOptions);
-
-    // --- Visa info-box vid klick på tidslinjens händelse ---
-    timeline.on("select", function (props) {
-      if(props.items.length === 0) return;
-      const item = timelineItems.find(i => i.id === props.items[0]);
-      if (!item) return;
-
-      const box = document.getElementById("info-box");
-      box.innerHTML = `
-        <h3>${item.content}</h3>
-        <p><strong>Beskrivning:</strong> ${item.description || "Ingen"}</p>
-        ${item.image ? `<img src="${item.image}" alt="${item.content}">` : ""}
-        ${item.source ? `<p><a href="${item.source}" target="_blank" rel="noopener">Källa</a></p>` : ""}
-      `;
-    });
-
-    // --- Cytoscape: skapa noder och länkar utifrån kopplingar ---
-    const cyContainer = document.getElementById('cy');
-
-    // Skapa noder för varje händelse
-    const cyNodes = timelineItems.map(item => ({
-      data: { id: item.id.toString(), label: item.content, description: item.description, source: item.source, image: item.image },
-      style: {
-        'background-color': categoryColors[item.group] || '#666',
-        'color': '#fff',
-        'text-valign': 'center',
-        'text-halign': 'center',
-        'label': item.content,
-        'text-wrap': 'wrap',
-        'text-max-width': 80,
-        'font-size': 12,
-      }
-    }));
-
-    // Skapa länkar (edges) baserat på "Kopplingar" – som kommaseparerad lista av index (händelsetitlar)
-    // Vi matchar kopplingar mot händelsetitel för att få id
-    const titleToIdMap = {};
-    timelineItems.forEach(item => {
-      titleToIdMap[item.content.trim()] = item.id.toString();
-    });
-
-    const cyEdges = [];
-    timelineItems.forEach(item => {
-      if(item.relations){
-        const relatedTitles = item.relations.split(",").map(s => s.trim()).filter(s => s.length > 0);
-        relatedTitles.forEach(relTitle => {
-          const targetId = titleToIdMap[relTitle];
-          if(targetId){
-            cyEdges.push({
-              data: {
-                id: `e${item.id}_${targetId}`,
-                source: item.id.toString(),
-                target: targetId
-              }
-            });
-          }
+function createGraphElements(events) {
+  const nodes = events.map(ev => ({
+    data: { id: ev.id, label: ev.title }
+  }));
+  const edges = [];
+  events.forEach(ev => {
+    if (ev.connections) {
+      ev.connections.forEach(conn => {
+        edges.push({
+          data: { source: ev.id, target: conn.target, label: conn.type }
         });
-      }
-    });
+      });
+    }
+  });
+  return { nodes, edges };
+}
 
-    const cy = cytoscape({
-      container: cyContainer,
-      elements: {
-        nodes: cyNodes,
-        edges: cyEdges
-      },
-      style: [
-        {
-          selector: 'node',
-          style: {
-            'label': 'data(label)',
-            'background-color': 'data(background-color)',
-            'color': '#fff',
-            'text-valign': 'center',
-            'text-halign': 'center',
-            'font-size': 12,
-            'text-wrap': 'wrap',
-            'text-max-width': 80,
-            'shape': 'roundrectangle',
-            'padding': '10px'
-          }
-        },
-        {
-          selector: 'edge',
-          style: {
-            'width': 2,
-            'line-color': '#ccc',
-            'target-arrow-color': '#ccc',
-            'target-arrow-shape': 'triangle'
-          }
-        },
-        {
-          selector: 'node:selected',
-          style: {
-            'border-width': 3,
-            'border-color': '#333',
-            'background-color': '#f39c12'
-          }
-        }
-      ],
-      layout: {
-        name: 'cose',
-        animate: true
-      }
-    });
-
-    // --- Info-box vid klick på node ---
-    cy.on('tap', 'node', function(evt){
-      const node = evt.target;
-      const box = document.getElementById('info-box');
-      box.innerHTML = `
-        <h3>${node.data('label')}</h3>
-        <p><strong>Beskrivning:</strong> ${node.data('description') || "Ingen"}</p>
-        ${node.data('image') ? `<img src="${node.data('image')}" alt="${node.data('label')}">` : ""}
-        ${node.data('source') ? `<p><a href="${node.data('source')}" target="_blank" rel="noopener">Källa</a></p>` : ""}
-      `;
-    });
-
-    // --- Växla mellan vyerna ---
-    const toggleBtn = document.getElementById("toggleViewBtn");
-    toggleBtn.addEventListener("click", () => {
-      if(timelineContainer.style.display !== "none"){
-        timelineContainer.style.display = "none";
-        cyContainer.style.display = "block";
-        toggleBtn.textContent = "Visa tidslinje";
-      } else {
-        cyContainer.style.display = "none";
-        timelineContainer.style.display = "block";
-        toggleBtn.textContent = "Visa grafvy";
-      }
-      // Rensa info-box vid vybyte
-      document.getElementById("info-box").innerHTML = "<em>Klicka på en händelse för mer information.</em>";
-    });
+function showDetails(event) {
+  const contentDiv = document.getElementById('details-content');
+  if (!event) {
+    contentDiv.innerHTML = 'Klicka på en händelse för mer info';
+    return;
   }
-});
+  const imgHtml = event.image ? `<img src="${event.image}" alt="${event.title}" />` : '';
+  const sourcesHtml = event.sources && event.sources.length
+    ? `<p>Källor: ${event.sources.map(s => `<a href="${s}" target="_blank">${s}</a>`).join(', ')}</p>`
+    : '';
+  contentDiv.innerHTML = `
+    <h3>${event.title}</h3>
+    <p><strong>Datum:</strong> ${event.start}${event.end ? ' - ' + event.end : ''}</p>
+    <p>${event.description}</p>
+    ${imgHtml}
+    ${sourcesHtml}
+  `;
+}
+
+async function init() {
+  const events = await loadData();
+
+  // Initiera tidslinje
+  const container = document.getElementById('timeline');
+  const items = new vis.DataSet(createTimelineItems(events));
+  const options = {
+    stack: false,
+    maxHeight: 400,
+    selectable: true,
+    zoomable: true,
+    moveable: true,
+    tooltip: {
+      followMouse: true
+    },
+    orientation: 'top'
+  };
+  const timeline = new vis.Timeline(container, items, options);
+
+  // Initiera Cytoscape-graf
+  const cy = cytoscape({
+    container: document.getElementById('graph'),
+    elements: createGraphElements(events),
+    style: [
+      {
+        selector: 'node',
+        style: {
+          'label': 'data(label)',
+          'background-color': '#0074D9',
+          'color': '#fff',
+          'text-valign': 'center',
+          'text-halign': 'center',
+          'width': 'label',
+          'height': 'label',
+          'padding': '10px',
+          'font-size': '12px',
+          'shape': 'roundrectangle',
+          'text-wrap': 'wrap',
+          'text-max-width': '80px',
+          'border-width': 1,
+          'border-color': '#005fa3'
+        }
+      },
+      {
+        selector: 'edge',
+        style: {
+          'curve-style': 'bezier',
+          'target-arrow-shape': 'triangle',
+          'label': 'data(label)',
+          'font-size': '10px',
+          'text-rotation': 'autorotate',
+          'line-color': '#ccc',
+          'target-arrow-color': '#ccc'
+        }
+      },
+      {
+        selector: ':selected',
+        style: {
+          'background-color': '#FF4136',
+          'line-color': '#FF4136',
+          'target-arrow-color': '#FF4136',
+          'source-arrow-color': '#FF4136'
+        }
+      }
+    ],
+    layout: {
+      name: 'cose',
+      padding: 10
+    }
+  });
+
+  // Klick på tidslinje väljer nod i grafen och visar detaljer
+  timeline.on('select', properties => {
+    if (properties.items.length === 1) {
+      const id = properties.items[0];
+      const ev = events.find(e => e.id === id);
+      showDetails(ev);
+      cy.$(`#${id}`).select();
+      cy.fit(`#${id}`, 50);
+    } else {
+      showDetails(null);
+      cy.elements().unselect();
+    }
+  });
+
+  // Klick på nod i graf visar detaljer och markerar i tidslinjen
+  cy.on('select unselect', 'node', evt => {
+    const selected = evt.target.selected();
+    if (selected) {
+      const id = evt.target.id();
+      const ev = events.find(e => e.id === id);
+      showDetails(ev);
+      timeline.setSelection(id, { focus: true });
+    } else {
+      showDetails(null);
+      timeline.setSelection([]);
+    }
+  });
+}
+
+init();
