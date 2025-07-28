@@ -42,4 +42,17 @@ Papa.parse("data.csv", {
 
     const timeline = new vis.Timeline(container, timelineItems, options);
   }
+
+  timeline.on("select", function (props) {
+  const item = timelineItems.find(i => i.id === props.items[0]);
+  if (!item) return;
+
+  const container = document.getElementById("info-box");
+
+  container.innerHTML = `
+    <h3>${item.content}</h3>
+    <p><strong>Beskrivning:</strong> ${item.description || "Ingen"}</p>
+    ${item.image ? `<img src="${item.image}" style="max-width:100%; margin-top:10px;">` : ""}
+    ${item.source ? `<p><a href="${item.source}" target="_blank">Källa</a></p>` : ""}
+  `;
 });
