@@ -2,7 +2,7 @@
 <html lang="sv">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Tidslinje & Samband</title>
 
   <!-- Lokal CSS för vis-timeline -->
@@ -16,14 +16,26 @@
       height: 100vh;
       font-family: sans-serif;
     }
-
     #timeline {
       flex: 1;
       border-right: 1px solid #ccc;
     }
-
     #graph {
       flex: 1;
+    }
+
+    /* Färgklasser för kategorier */
+    .krig {
+      background-color: #e74c3c !important;
+      color: white !important;
+    }
+    .revolution {
+      background-color: #3498db !important;
+      color: white !important;
+    }
+    .vetenskap {
+      background-color: #2ecc71 !important;
+      color: white !important;
     }
   </style>
 </head>
