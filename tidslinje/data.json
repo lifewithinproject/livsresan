@@ -1,0 +1,38 @@
+[
+  {
+    "id": "e1",
+    "title": "Slaget vid Lützen",
+    "start": "1632-11-16",
+    "end": null,
+    "description": "Gustav II Adolf dör i dimma",
+    "categories": ["Krig"],
+    "sources": ["https://sv.wikipedia.org/wiki/Slaget_vid_Lützen"],
+    "image": "https://exempel.se/bild1.jpg",
+    "connections": [{"target": "e2", "type": "orsakar"}],
+    "geo": "Sverige"
+  },
+  {
+    "id": "e2",
+    "title": "Franska revolutionen",
+    "start": "1789-07-14",
+    "end": null,
+    "description": "Stormningen av Bastiljen markerar början",
+    "categories": ["Revolution"],
+    "sources": ["https://sv.wikipedia.org/wiki/Franska_revolutionen"],
+    "image": "https://exempel.se/bild2.jpg",
+    "connections": [{"target": "e3", "type": "inspirerar"}],
+    "geo": "Frankrike"
+  },
+  {
+    "id": "e3",
+    "title": "Månraketen Apollo 11",
+    "start": "1969-07-20",
+    "end": null,
+    "description": "Första människan på månen",
+    "categories": ["Vetenskap"],
+    "sources": ["https://sv.wikipedia.org/wiki/Apollo_11"],
+    "image": "https://exempel.se/bild3.jpg",
+    "connections": [],
+    "geo": "USA"
+  }
+]
